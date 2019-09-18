@@ -25,5 +25,6 @@ Bitcoin一開始便是為了解決誰可以是有公信力的發行者、誰又�
 區塊鏈每年都在變，但基礎架構與科學是不變的，期望透過簡單復刻→基礎理論解說→實際例子的過程中掌握區塊鏈的核心概念，即便有下一世代的區塊鏈出現，也可以很快掌握住。
 
 # Ref:
-- https://bmg-group.com/usd-purchasing-power-currency-in-circulation/
-- https://observationsandnotes.blogspot.com/2011/04/100-year-declining-value-of-us-dollar.html
+- [USD – Purchasing Power – Currency in Circulation](https://bmg-group.com/usd-purchasing-power-currency-in-circulation/)
+- [The Decrease in Purchasing Power of the U.S. Dollar Since 1900](https://observationsandnotes.blogspot.com/2011/04/100-year-declining-value-of-us-dollar.html)
+
