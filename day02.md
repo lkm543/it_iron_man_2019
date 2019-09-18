@@ -95,4 +95,4 @@ class BlockChain:
 
 今天先到此為止，明天我們再來研究怎麼樣讓區塊能夠被挖掘！
 
-到目前為止的文章都會放置到[Github](https://github.com/lkm543/it_iron_man_2019)上，程式碼可則以參考[這裡](https://github.com/lkm543/it_iron_man_2019/code/day02.py)。
+到目前為止的文章都會放置到[Github](https://github.com/lkm543/it_iron_man_2019)上，程式碼可則以參考[這裡](https://github.com/lkm543/it_iron_man_2019/blob/master/code/day02.py)。
