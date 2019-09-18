@@ -9,13 +9,16 @@
 2008年的金融風暴讓人們開始認知到銀行不一定可以被信任，銀行收走我們的錢後並沒有有效的管控，而貨幣持續的通貨膨脹，在過去120年來讓貨幣的購買力下跌了30倍，截至今天也還在下跌中。
 
 ![Purchasing Power of US Dollar](https://4.bp.blogspot.com/-YTyPGaEsBcw/T0Kd1nS9zJI/AAAAAAAABQw/MhD1cWnfJI8/s1600/Purchasing%2BPower%2Bof%2BU.S.%2BDollar.jpg)
+圖片來源：[Observations](https://observationsandnotes.blogspot.com/)
 
 貨幣購買力下降的主因除了經濟成長外，也與政府不斷發行新貨幣進入市場有相關，小幅的通貨膨脹是正常的經濟活動，但貨幣流通量增加的速度實際上遠遠超出你我的想像，下圖是美金流通量的歷史。
 
 ![US Currency in Circulation](https://goldsilverworlds.com/wp-content/uploads/2014/04/US_Currency_circulation_1920_2014.jpg)
+圖片來源：[Gold Silver Worlds](https://goldsilverworlds.com/)
 
 所以問題來了，要怎麼信任你手中的貨幣在未來是有價值的？但除了政府之外，又能相信誰具有公信力可以發行大家都能接受的貨幣？又怎能保證發行者在未來不會繼續超發呢？除了被政府法規管制與規範的銀行外，誰又有能力幫大眾保管資產或交易？
 ![USD – Purchasing Power & Currency in Circulation](https://bmg-group.com/wp-content/uploads/2018/10/cpi-purchasing-power-2018.10.03.jpg)
+圖片來源：[BMG Group Inc.](https://bmg-group.com/)
 
 # Be your own bank.
 Bitcoin一開始便是為了解決誰可以是有公信力的發行者、誰又可以是公正的保管者的問題。中本聰提供的解決方案就是把貨幣的發行與詮釋權發還給大眾，並搭配密碼學來確保大眾手上的資料難以被竄改(這也是為什麼有時候會被叫成加密貨幣)，也就是人人手上都可以有帳本、每個人都是銀行來保證了共識的公正與執行，也因此Bitcoin的最初願景便是"Be your own bank."。值得一提的是區塊鏈並不是非常新的概念，銀行間很早就以類似分散式帳本的技術在做資料的交換與溝通，但狹義的公鏈與傳統分散式帳本最大的不同就是permissionless，也就是你若有意願加入並分享帳本的話並不需要任何人的允許，透過成員間的自由的加入與退出來達成去中心化與社群共治的目標。
