@@ -141,6 +141,7 @@ if __name__ == '__main__':
 但有個問題：我要怎麼知道發起交易的那方便是帳戶的持有者？如果不事先確認的話，代表任意路人都可以把別人的帳戶餘額領走，是萬萬不可的事情。那麼我們又要如何確認誰擁有這個帳號？誰有權力發起交易？
 
 到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上，至於程式碼則放在[這裡](https://github.com/lkm543/it_iron_man_2019/blob/master/code/day04.py)。
+
 # Ref:
 - [比特幣系統是如何調整挖礦難度的？](https://kknews.cc/zh-tw/tech/mpz4rjg.html)
 - [Cryptocurrency Mining: Why Use FPGA for Mining? FPGA vs GPU vs ASIC Explained](https://medium.com/fpga-guide/cryptocurrency-mining-why-use-fpga-for-mining-fpga-vs-gpu-vs-asic-explained-5aaa400082b9)
