@@ -19,10 +19,10 @@
 
 但同時產生的`2ef7bde608ce5404e97d5f042f95f89f1c232871`無法反推回原本的`Hello World!`。由於輸入資料的不同，往往我們可以把哈希數視作幾近隨機的位元組所構成(但仍然會因為哈希函數的不同而有所變異)
 
-![hash](https://www.lkm543.site/it_iron_man/day3_1.png)
+![hash](https://www.lkm543.site/it_iron_man/day3_1.jpg)
 [這個網址](https://www.fileformat.info/tool/hash.htm)有更多的哈希函式的轉換可以試玩看看，以`Hello World!`這個字串為例，各種轉換法輸出的哈希值也不相同。
 
-![Hello World!](https://www.lkm543.site/it_iron_man/day3_2.png)
+![Hello World!](https://www.lkm543.site/it_iron_man/day3_2.jpg)
 
 在這裡我們先把下面這些資料連接後作為哈希函式的輸入：
 
@@ -31,7 +31,7 @@
 3. 所有的交易明細(`transactions`)
 4. 挖掘中的`nonce`值
 
-![Our Hash](https://www.lkm543.site/it_iron_man/day3_3.png)
+![Our Hash](https://www.lkm543.site/it_iron_man/day3_3.jpg)
 
 下面是我們今天的程式碼，其中`transaction_to_string`負責把交易明細轉換成字串、`get_transactions_string`負責把區塊紀錄的所有交易明細轉換成一個字串、`get_hash`負責依據這四筆資料產生相對應的哈希數。
 
@@ -119,7 +119,7 @@ def add_transaction_to_block(self, block):
 
 接著我們就可以來挖掘產生新區塊了，挖掘的步驟是透過改變`nonce`值(從0,1,2,3....直到找到符合的`nonce`)而得到新的哈希數，在這裡我們把難度定義為"開頭有幾個0"，也就是每次改變`nonce`、產生一個新的`hash`數後來確認有沒有符合要求(開頭有幾個0)，如果符合就代表我們找到一個合規`nonce`值了！但如果沒有，就只好持續的往下找了。也因為運算量越大能夠找到合規的`nonce`值的機率也越大，也因此這個方法又被稱為`Proof of Work(POW)`。
 
-![Mine](https://www.lkm543.site/it_iron_man/day3_4.png)
+![Mine](https://www.lkm543.site/it_iron_man/day3_4.jpg)
 
 但透過這個方式區塊的產生時間會非常地不穩定，你可以到[bitcoin的區塊瀏覽器](https://www.blockchain.com/explorer)看看產出的時間，bitcoin預設是每十分鐘應該要產出一個區塊，但也可以發現實際上每個區塊的產生時間會跟十分鐘有點落差，這是POW的必然結果。
 

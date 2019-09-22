@@ -63,7 +63,7 @@ def get_address_from_public(self, public):
 
 這就是我們常看到在[Bitcoin](https://www.blockchain.com/explorer)或[Ethereum](https://etherscan.io/)上看到的一連串像是隨機位元組的地址由來了！
 
-但到這裡你可能會有個疑問：產生的公私鑰/帳號會不會有重複的可能？  答案是：會！但是機率~0
+但到這裡你可能會有個疑問：產生的公私鑰/帳號會不會有重複的可能？  答案是：會！但是機率\~0
 這是密碼學中有名的生日碰撞問題(Birthday attack)，詳請可以參考[這裡](http://www.qukuai.top/d/370)還有[這裡](https://medium.com/myethacademy/%E9%8C%A2%E5%8C%85%E5%9C%B0%E5%9D%80%E6%9C%89%E6%A9%9F%E6%9C%83%E9%87%8D%E8%A4%87%E5%97%8E-be1a37337ba0)
 
 總而言之在區塊鏈接納這筆交易前，先試著用地址反推回原本的公鑰，再用公鑰解密當初這筆交易紀錄的簽章看看，如果公鑰解的開就可以代表是公鑰持有人本人所簽核的，這便是剛剛提到的"數位簽章"。

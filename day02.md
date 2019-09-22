@@ -1,11 +1,11 @@
 # 區塊鏈的架構
 ## Transaction
 打造一個簡單的區塊鏈之前，先來了解區塊鏈的架構與裏頭具備哪些要點。就像我們平常習慣用的銀行轉帳一樣，每筆交易都會產生一筆交易明細，詳細記錄了這筆交易的發送人、接收者、金額、手續費與備註，交易明細的功能除了作為憑證外，同時在銀行端也可以拿來核對，也就是俗稱的"軋帳"，這裡的每一筆交易明細我們先稱之為`Transaction`。
-![Transaction](https://www.lkm543.site/it_iron_man/day2_1.png)
+![Transaction](https://www.lkm543.site/it_iron_man/day2_1.jpg)
 
 ## Blocks of transactions
 所有的`Transaction`會根據時間順序被放置到一個個區塊(`Block`)內，就像是把銀行把每個工作日早上九點到下午三點半前的所有交易紀錄都存在同一天的帳本裡一樣，如此周而復始，當有新的區塊正在產出，新生成的所有交易紀錄都會被放置在該區塊之下。
-![Blockchain](https://www.lkm543.site/it_iron_man/day2_2.png)
+![Blockchain](https://www.lkm543.site/it_iron_man/day2_2.jpg)
 
 你可能會有疑問說為什麼要這樣設計？為什麼不把所有的交易紀錄通通放在同一個區塊就好？
 
@@ -44,7 +44,7 @@ class Transaction:
 
 每一個區塊包含了許多筆交易(`Transaction`)，就像是帳本的內頁儲存了許多交易紀錄，值得一提的是這裡為了加密的需求會記錄前後一個區塊的哈希(`hash`)值，也就是每一塊之間的哈希值是環環相扣的，也可以把哈希值看做是每個區塊上的鎖頭，而礦工挖掘出的`nonce`則代表了能夠匹配這個鎖頭的鑰匙(或另一把鎖)，而且下一個區塊的哈希值又根據這個`nonce`值而產生，如此一來只要其中任何一個交易紀錄、區塊被竄改，則整個鍊上的`nonce`跟`hash`都需要修正，並且需要在新的區塊產生前計算/修正完畢，這需要擁有異常龐大的計算量，也因此竄改區塊鏈是幾近不可能的事情。
 
-![Hash and Nonce](https://www.lkm543.site/it_iron_man/day2_3.png)
+![Hash and Nonce](https://www.lkm543.site/it_iron_man/day2_3.jpg)
 
 至於甚麼是hash、區塊間如何加密的細節我們之後會再來探討。
 
