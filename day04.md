@@ -11,7 +11,7 @@
 
 那怎麼去評估區塊的產生時間呢？如果單純採用前一個區塊的產出時間很明顯的是不可行，因為`POW`的核心精神是利用隨機數去猜到可能可以符合的`nonce`，因此每一個區塊的產出時間會變動相當大：
 
-![Block time diversity](https://www.lkm543.site/it_iron_man/day4_1.png)
+![Block time diversity](https://www.lkm543.site/it_iron_man/day4_1.jpg)
 
 根據上圖看到我們的區塊鏈在難度5的狀況下，連續十塊的出塊時間從0.47秒到39.44秒都有可能，昨天提到的[區塊鍊瀏覽器](https://www.blockchain.com/explorer)裏頭也可以發現出塊時間會不斷跳動，因此根據單個區塊的出塊時間決定難度是萬萬不可行的，取而代之的方法便是取多個區塊的出塊時間再取平均，有點像是訊號處理中的均值濾波器。
 
@@ -124,16 +124,16 @@ if __name__ == '__main__':
     block.verify_blockchain()
 ```
 
-![Fake Transaction](https://www.lkm543.site/it_iron_man/day4_2.png)
+![Fake Transaction](https://www.lkm543.site/it_iron_man/day4_2.jpg)
 
 除此之外你也可以到[這裡](https://anders.com/blockchain/blockchain)玩玩看區塊鏈，一開始所有資料都是正確無誤的，所以會顯示綠色：
 
-![Demo](https://www.lkm543.site/it_iron_man/day4_3.png)
+![Demo](https://www.lkm543.site/it_iron_man/day4_3.jpg)
 
 一旦你在前面區塊中亂插入一些紀錄，你會發現從該區塊之後的所有哈希數通通被打亂了！像是在這裡我插入：
 `"I am Bill Gates"`
 
-![Demo](https://www.lkm543.site/it_iron_man/day4_4.png)
+![Demo](https://www.lkm543.site/it_iron_man/day4_4.jpg)
 
 被更改的區塊後的所有區塊都必須從新被計算哈希數，否則會完全對不起來而被輕易發現資料被竄改過！當然可以選擇重新計算所有的哈希數，但當主鏈夠長時，重新計算所有的哈希數所需要的運算量與成本非常可怕，也因此保障了區塊鏈的不可竄改性。更何況在重新計算時，正常的塊也在不停的被一般的礦工產出，要跟所有的礦工競爭幾近天方夜譚。
 
