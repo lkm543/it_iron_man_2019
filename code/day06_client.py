@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pickle
 import socket
 import sys
 import threading
@@ -100,26 +101,23 @@ if __name__ == "__main__":
         elif command_dict[str(command)] == "get_balance":
             address = input("Address: ")
             message['address'] = address
-            client.send(str(message).encode('utf8'))
+            client.send(pickle.dumps(message))
 
         elif command_dict[str(command)] == "transaction":
-            message['address'] = input("Address: ")
+            address = input("Address: ")
             private_key = input("Private_key: ")
-            message['receiver'] = input("Receiver: ")
-            message['amount'] = input("Amount: ")
-            message['fee'] = input("Fee: ")
-            message['comment'] = input("Comment: ")
+            receiver = input("Receiver: ")
+            amount = input("Amount: ")
+            fee = input("Fee: ")
+            comment = input("Comment: ")
             new_transaction = initialize_transaction(
-                message["address"], 
-                message["receiver"],
-                int(message["amount"]),
-                int(message["fee"]),
-                message["comment"]
+                address, receiver, int(amount), int(fee), comment
             )
             signature = sign_transaction(new_transaction, private_key)
+            message["data"] = new_transaction
             message["signature"] = signature
 
-            client.send(str(message).encode('utf8'))
+            client.send(pickle.dumps(message))
 
         else:
             print("Unknown command.")
