@@ -1,5 +1,5 @@
-import ast
 import hashlib
+import pickle
 import socket
 import sys
 import threading
@@ -229,10 +229,12 @@ class BlockChain:
         with connection:
             print(f'Connected by: {address}')
             while True:
-                message = connection.recv(1024).decode('utf8')
+                message = connection.recv(1024)
                 print(f"[*] Received: {message}")
-                parsed_message = ast.literal_eval(message)
-
+                try:
+                    parsed_message = pickle.loads(message)
+                except Exception:
+                    print(f"{message} cannot be parsed")
                 if message:
                     if parsed_message["request"] == "get_balance":
                         print("Start to get the balance for client...")
@@ -244,14 +246,7 @@ class BlockChain:
                         }
                     elif parsed_message["request"] == "transaction":
                         print("Start to transaction for client...")
-                        address = parsed_message["address"]
-                        new_transaction = self.initialize_transaction(
-                            parsed_message["address"], 
-                            parsed_message["receiver"],
-                            int(parsed_message["amount"]),
-                            int(parsed_message["fee"]),
-                            parsed_message["comment"]
-                        )
+                        new_transaction = parsed_message["data"]
                         result, result_message = self.add_transaction(
                             new_transaction,
                             parsed_message["signature"]
