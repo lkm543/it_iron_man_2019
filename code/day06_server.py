@@ -110,13 +110,12 @@ class BlockChain:
             new_block.nonce += 1
             new_block.hash = self.get_hash(new_block, new_block.nonce)
 
-        new_block.timestamp = int(time.time())
         time_consumed = round(time.process_time() - start, 5)
         print(f"Hash found: {new_block.hash} @ difficulty {self.difficulty}, time cost: {time_consumed}s")
         self.chain.append(new_block)
 
     def adjust_difficulty(self):
-        if len(self.chain) % self.adjust_difficulty_blocks:
+        if len(self.chain) % self.adjust_difficulty_blocks != 1:
             return self.difficulty
         elif len(self.chain) <= self.adjust_difficulty_blocks:
             return self.difficulty
