@@ -141,7 +141,6 @@ def mine_block(self, miner):
         new_block.nonce += 1
         new_block.hash = self.get_hash(new_block, new_block.nonce)
 
-    new_block.timestamp = int(time.time())
     time_consumed = round(time.process_time() - start, 5)
     print(f"Hash found: {new_block.hash} @ difficulty {self.difficulty}, time cost: {time_consumed}s")
     self.chain.append(new_block)

@@ -20,7 +20,7 @@
 
 ```python
 def adjust_difficulty(self):
-    if len(self.chain) % self.adjust_difficulty_blocks:
+    if len(self.chain) % self.adjust_difficulty_blocks != 0:
         return self.difficulty
     elif len(self.chain) <= self.adjust_difficulty_blocks:
         return self.difficulty
