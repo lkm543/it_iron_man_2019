@@ -73,7 +73,10 @@ def get_hash(self, block, nonce):
 ## Bitcoin中的Merkle Tree
 
 下圖是應用在Bitcoin上的Merkle Tree，最底層是每一筆交易，透過計算每筆交易的哈希值後再兩兩運算可以得到Merkle Tree供以後驗證之用，大抵上的過程跟我們上頭講解的是一樣的(~~因為原本就是用Bitcoin來舉例~~)
+
 ![Bitcoin](https://en.bitcoinwiki.org/upload/en/images/thumb/9/95/Hash_Tree.svg/500px-Hash_Tree.svg.png)
+
+圖片來源：[BitcoinWiki](https://en.bitcoinwiki.org/wiki/Main_Page)
 
 建立好Merkle Tree後就可以大幅減少驗證交易所需要的資訊量，也因此Bitcoin提供了兩種節點`Full node`與`SPV(Simplified Payment Verification) node`：
 
