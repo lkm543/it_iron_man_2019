@@ -370,7 +370,7 @@ class BlockChain:
         else:
             if block_data.hash[0: self.difficulty] == '0' * self.difficulty:
                 for transaction in block_data.transactions:
-                    self.chain.remove(transaction)
+                        self.pending_transaction.remove(transaction)
                 self.receive_verified_block = True
                 self.chain.append(block_data)
                 return True
