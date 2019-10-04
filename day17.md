@@ -98,6 +98,10 @@ FPGA是Field Programmable Gate Array的縮寫，中文叫做"現場可程式化�
 
 如果使用FPGA來挖礦，速度上會勝過CPU與GPU，但同時算法又可以更改的，也因此在分類上通常會把FPGA介於家用的CPU、GPU與等等會提到的ASIC中間。
 
+![FPGA](https://www.xilinx.com/content/dam/xilinx/imgs/products/alveo/alveo.png)
+
+圖片來源：[Xilink](https://www.xilinx.com/products/boards-and-kits/alveo.html)
+
 ## ASIC(Application-Specific Integrated Circuit)
 
 一般的CPU架構是偏向複雜指令集(CISC)計算、GPU架構偏向簡單指令集(RISC)，會說偏向是因為CPU與GPU裡還是有架構的不同，並沒有一定，像常聽到的ARM架構CPU反而就偏向RISC。
