@@ -102,21 +102,21 @@ UTXO的架構是以UTXO為單位進行交易，因此可以同時發起複數個
 
 ### Account架構如何預防雙花攻擊
 
+為了避免雙花攻擊，Ethereum會給單一Account發出的交易一個逐漸遞增的nonce值，也就是下圖中的紅色框框，nonce值較小的交易便會優先執行，因此收款方便可以透過查閱該帳戶所有簽發過的交易次序來事先確認該交易的優先順序為何。
+
 ![Etherscan](http://www.lkm543.site/it_iron_man/day26_6.JPG)
 
 圖片來源: [etherscan](https://etherscan.io/tx/0x5b9e49b7d8f1a8709ab8f334691c4152ea395ada213159679ff3292f1dcd3a76)
-
-為了避免雙花攻擊，Ethereum會給單一Account發出的交易一個逐漸遞增的nonce值，也就是上圖中的紅色框框，nonce值較小的交易便會優先執行，因此收款方便可以透過查閱該帳戶所有簽發過的交易次序來事先確認該交易的優先順序為何。
 
 ### Input Data
 
 如果你有仔細看的話應該會發現Ethereum的交易紀錄中有一欄`Input Data`，該欄位也可以拿來觸發過幾天後我們會提到的智能合約的功能，透過Input Data告知區塊鏈上的礦工我們想要觸發智能合約裡的哪個函式，或是可以用來記錄這筆交易的用途，有時候甚至會利用區塊鏈的不可竄改特性特意遺留某些文字在區塊鏈上。
 
+比方說在[這裡](https://etherscan.io/tx/0xf56d81301da93f71368ad7f8d605648d77be6edb13e8875cf3e5906f38d1b548)你可以看到由Ryu Gi-hyeok寫入的南北韓和平宣言(下圖)，或是由不知名人士為避免政府封鎖所寫入的[北大性侵案](https://etherscan.io/tx/0x2d6a7b0f6adeff38423d4c62cd8b6ccb708ddad85da5d3d06756ad4d8a04a6a2)。要觀看這些文字只需要簡單按下Click to see More，並再View input as那欄選擇UTF-8便可以用文字的形式閱讀。
+
 ![Etherscan](http://www.lkm543.site/it_iron_man/day26_7.JPG)
 
 圖片來源: [etherscan](https://etherscan.io/tx/0xf56d81301da93f71368ad7f8d605648d77be6edb13e8875cf3e5906f38d1b548)
-
-比方說在[這裡](https://etherscan.io/tx/0xf56d81301da93f71368ad7f8d605648d77be6edb13e8875cf3e5906f38d1b548)你可以看到由Ryu Gi-hyeok寫入的南北韓和平宣言(上圖)，或是由不知名人士為避免政府封鎖所寫入的[北大性侵案](https://etherscan.io/tx/0x2d6a7b0f6adeff38423d4c62cd8b6ccb708ddad85da5d3d06756ad4d8a04a6a2)。要觀看這些文字只需要簡單按下Click to see More，並再View input as那欄選擇UTF-8便可以用文字的形式閱讀。
 
 ### Account架構的優點
 
