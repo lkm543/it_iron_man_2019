@@ -112,8 +112,6 @@ OP_HASH160 3aaaf9a2c06124ad1bf433ba9b2f78634b81e77b OP_EQUAL
 
 ![Lightning Network_ABC](https://www.lkm543.site/it_iron_man/day27_2.jpg)
 
-圖片擷取自: [Lightning Network Visualizer](https://graph.lndexplorer.com/)
-
 你可以到[Lightning Network Visualizer](https://graph.lndexplorer.com/)這個網站上看目前閃電網路的圖形化介面，只要你與上頭的任何一個節點開啟支付通道，那麼你便可以與節點上連接的所有閃電網路進行無延遲、無手續費的交易！
 
 ![Lightning Network](https://www.lkm543.site/it_iron_man/day27_3.JPG)
