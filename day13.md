@@ -1,92 +1,112 @@
-在講解完昨天的2種加密法─XOR Cipher與Substitution-Permutation Network(SPN)後，我們今天要來講解Feistel Cipher與區塊加密，講解完區塊加密後，你就可以發現區塊加密其實跟區塊鏈架構是一樣的！
+# Merkle Tree
 
-# Feistel Cipher
-Feistel在1973所提出Feistel Cipher，幾乎被應用在所有區塊加密的演算法上(區塊加密是甚麼以下會再說明)，Feistel Cipher跟昨天提到的Substitution Permutation Network的精神很類似：用各種算法算很多輪來打散密文與明文間的關係，下圖是Feistel Cipher的演算法流程：
+![Merkle Tree](https://www.lkm543.site/it_iron_man/day14_1.PNG)
 
-![Feistel Cipher](https://www.tutorialspoint.com/cryptography/images/feistel_structure.jpg)
+我們在密碼學的開頭已經講解過哈希(湊雜)的原理以及應用，而今天要談到的`Merkle Tree`其實是演算法裏頭的一種二元樹，透過兩兩計算哈希值的方法來驗證資料的正確性跟完整性。以上圖為例，上面的Merkle Tree最底層可以看做是Bitcoin的每一筆交易，每一筆交易可以分別計算出哈希值，接著在兩兩一對分別計算兩哈希值的哈希值，直到最後只剩下一個哈希值hash(ABCD)，這時候我們稱它為`Merkle Root`。
 
-圖片來源：[tutorialspoint](https://www.tutorialspoint.com/cryptography/)
+## 為什麼不直接連接(concatenation)所有交易再Hash就好？
 
-Feistel Cipher首先會跟SPN一樣利用一把原始金鑰生成(回合數)個金鑰，隨後把明文切割成左右兩部分(L0與R0)，接著在每一回合中，依序在第N回合中對左右兩部分做：
+我們在之前的實作區塊鏈中，定義了我們的哈希值是由四種不同的狀態透過哈希函式sha-1計算而得(其實sha-1已經被破譯了，實務上盡量避免用sha-1)：
 
-1. 把右邊(RN)的的部分跟第N把金鑰作F函數的轉換(RN')
-2. 第一步驟轉換出來的結果(RN')再和這一回合的左邊做XOR運算便是新產生的右邊(RN+1=LN⊕RN')
-3. 接著再把此輪的右邊的原始資料直接當作下一輪的左邊(LN+1=RN)
+1. 前一個區塊的哈希值
+2. 區塊最初的時間
+3. 把所有的交易訊息連接成一個字串
+4. nonce值(複習一下：礦工在找的就是這個nonce值)
 
-與SPN相同，加解密都是利用相同的編碼方法，因此密文解密的過程即是把加密的過程反過來，即可。要注意的是F函數應該要有取代的功能(因為左右兩邊交換的過程中其實已經有置換，但沒有取代，取代應該要在F函數中被實做出來)，此外，F函數的設計也會影響到攻擊的難度，F函數越複雜，由密文拆解出明文就會越困難。
+```python
+def transaction_to_string(self, transaction):
+    transaction_dict = {
+        'sender': str(transaction.sender),
+        'receiver': str(transaction.receiver),
+        'amounts': transaction.amounts,
+        'fee': transaction.fee,
+        'message': transaction.message
+    }
+    return str(transaction_dict)
 
-如果F函數用的是跟SPN同樣的s_box呢?這樣的話就很像我們昨天提到的SPN網路，但SPN網路在實務上比較容易被平行運算，在GPU或ASIC的運算上能夠很輕易的實現，但在嵌入式或是智慧卡上頭SPN就不太適用了。另外用s_box當作F函數其實就是我們之前提到的Data Encryption Standard(DES)。
+def get_transactions_string(self, block):
+    transaction_str = ''
+    for transaction in block.transactions:
+        transaction_str += self.transaction_to_string(transaction)
+    return transaction_str
 
+def get_hash(self, block, nonce):
+    s = hashlib.sha1()
+    s.update(
+        (
+            block.previous_hash
+            + str(block.timestamp)
+            + self.get_transactions_string(block)
+            + str(nonce)
+        ).encode("utf-8")
+    )
+    h = s.hexdigest()
+    return h
+```
 
-# 串流加密 vs 區塊加密
+這是很簡單也很容易理解的算法：只要這個區塊中的任何一個交易被修改過，由交易紀錄連接起來的字串會跟著改變，那麼最後算出來的哈希值也必定會發生改變，從而讓我們得知裏頭的資料並不可信。
 
-我們到目前為止提到的加密法都是對稱式加密，對稱式加密指的是加解密用的是同一把金鑰，而對稱式加密裏頭又可以分成：串流加密(stream cipher)與區塊加密(block cipher)。
+但如果我們的確這樣做的話，我們會如何驗證一筆交易是否真的存在呢？這時候只能照著自己設計的演算法需求把該區塊的所有交易通通都收集起來，然後再連接、再跟其他參數計算Hash看有沒有吻合，也就是說**為了驗證一筆交易，必須把同一區塊內的所有交易紀錄都下載下來**。
 
-串流加密是透過固定的算法與金鑰，對明文的位元逐個做加解密，也就是同一套模式從第一個字元運算到最後一個字元，好處是運算速度快，可以隨時隨著資料的輸入而加密，通常運用在通訊上。
+## Merkle Tree如何驗證交易
 
-區塊加密則不然，每個區塊加密都有**固定長度的輸入**，也就是區塊加密每次只能加密固定長度的資料，如果要加密的資料超出區塊加密法能夠加密的上限，就把原始資料切割成許多子資料後再分別加密；如果資料長度不足則需要補齊到區塊加密法能接收的長度。我們介紹的SPN或是Feistel Cipher因為都有固定長度的輸入，因此兩者都屬於區塊加密。
+![Merkle Tree Verify](https://www.lkm543.site/it_iron_man/day14_2.png)
 
-目前主流的加密方法都是區塊加密了，因此我們接下來對幾種區塊加密的方法做個簡介：
+但有了Merkle Tree就不一樣了，以上圖為例，假設我們想要確認Tx D是否存在這個區塊中，那我們只需要下載這個區塊的Hash(C)、Hash(AB)、跟Hash(ABCD)三個值(順待一提，這裡的Hash(ABCD)就是這個區塊的Merkle Root)，驗證的方法就是：
 
-## Electronic codebook(ECB)
+1. 計算Tx D的哈希值Hash(D)
+2. 計算Hash(D)與Hash(C)的哈希值Hash(CD)
+3. 計算Hash(AB)與Hash(CD)的哈希值Hash(ABCD)
+4. 確認我們計算出來的Hah(ABCD)跟區塊裡的Merkle Root或Hash(ABCD)有沒有一致
+5. 一致→該筆交易的確存在這個區塊，不一致→該筆交易不存在於這個區塊
 
-在Electronic codebook(ECB)的模式中會根據區塊加密法每次能夠加密的資料大小把資料切割成許多獨立的區塊，每個區塊再獨立地被加解密，下面是它的流程圖：
+以bitcoin而言，實際上一個區塊平均會有3-500筆交易在裏頭(可以參考[這裡](https://www.quora.com/How-many-transactions-are-included-in-a-block-chain))，為了方便計算我們假定這個區塊中有512筆交易。也就是最下面代表交易的交易node有512個點、再上一層有256個點、再上一層有128個點....，那麼透過Merkle Tree，我們只需要取得Merkle Root跟另外8個Hash值便可以驗證該筆交易是否為真。
 
-加密
-![CBC Encryption](https://upload.wikimedia.org/wikipedia/commons/c/c4/Ecb_encryption.png)
+`512筆交易 vs 8個Hash`，需要的資料整整少了64倍(因為交易的大小會大於Hash大小，實際上會節省更多空間)，這就是Merkle Tree的威力！
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
+## Second preimage attack
 
-解密
-![CBC Decryption](https://upload.wikimedia.org/wikipedia/commons/6/66/Ecb_decryption.png)
+但有沒有可能即便算出來的Merkle Root是一致的，但裏頭的Transaction不一樣呢？當然有可能，如果你有印象之前提到的生日碰撞，該問題是：給定一哈希值H，要找出經過哈希函數轉後後也是H的任一明文；而這裡的問題有點小小的不同：給定明文(在這裡是交易)M1後，要找出另一個明文M2跟M1在特定的哈希函數下擁有相同的哈希值，白話文就是我要找到另外一個交易紀錄同樣經過哈希函數後可以吻合Merkle Root的話，我就可以騙過整個驗證系統，這就是密碼學上所稱的`Second preimage attack`。
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
+不過這個機率很小很小，小到幾乎可以忽略，因為Bitcoin使用的是SHA-256加密法，也就是說每次新產生的交易M2跟欲攻擊的交易M1有相通Hash值的機率只有2^-256次方。
 
-但ECB的缺陷就是包含同樣資訊的區塊會被加密成同樣的密文，使得Diffusion不足(無法保障密文與明文間的複雜)。
+## Bitcoin中的Merkle Tree
 
-### 重放攻擊 
+下圖是應用在Bitcoin上的Merkle Tree，最底層是每一筆交易，透過計算每筆交易的哈希值後再兩兩運算可以得到Merkle Tree供以後驗證之用，大抵上的過程跟我們上頭講解的是一樣的(~~因為原本就是用Bitcoin來舉例~~)
 
-另外一個ECB模式的缺陷就是容易被**重放攻擊**(應念二聲ㄔㄨㄥˊ，重複的重)，意即因為每一個區塊都有獨立的訊息，即使攻擊者不知道加密方式與金鑰，只要攻擊者知道區塊的功能後也只需要重複傳遞該區塊，接收端便會誤認接收了多次相同的訊息，比方說其中一個區塊是匯款給他人，那麼攻擊者可以透過不斷傳遞該區塊的方式把使用者的餘額給提領光。
+![Bitcoin](https://en.bitcoinwiki.org/upload/en/images/thumb/9/95/Hash_Tree.svg/500px-Hash_Tree.svg.png)
 
-## Cipher-block chaining(CBC)
+圖片來源：[BitcoinWiki](https://en.bitcoinwiki.org/wiki/Main_Page)
 
-ECB模式的問題在於當我們紀錄連續資料時，容易被重放攻擊，同時也很難逐一驗證每個區塊資訊是否有被竄改過，因此Cipher-block chaining(CBC)便應運而生，在CBC模式中，每區塊的明文會先跟前一個密文區塊進行XOR運算後再加密。因為此時每個區塊的加密都會使用到前面所有區塊的參數，因此只要中間其中一個區塊被更改過，那麼便會輕易地被發現，下圖是它概要的加解密流程。
+建立好Merkle Tree後就可以大幅減少驗證交易所需要的資訊量，也因此Bitcoin提供了兩種節點`Full node`與`SPV(Simplified Payment Verification) node`：
 
-加密
-![CBC Encryption](https://upload.wikimedia.org/wikipedia/commons/d/d3/Cbc_encryption.png)
+### Full Node
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
+Full Node的話很好理解，就是儲存了自創世塊以來的所有交易，如果你想要開一個Full Node的話，[Bitcoin org](https://bitcoin.org/en/full-node#special-cases)有建議的硬體規格如下：
 
-解密
-![CBC Decryption](https://upload.wikimedia.org/wikipedia/commons/6/66/Cbc_decryption.png)
+- 200 GB的儲存空間，另外讀寫速度都要在100MB/s以上.
+- 2GB以上的記憶體
+- 上傳速度400 Kbps的網路
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
+可以發現最難的還是卡在Full Node為了儲存所有交易紀錄所需要的空間(建議200GB)，這對筆記型電腦或個人PC來說或許不難，可是對手機等行動裝置來說就有點太大了，不然你可以看[iPhone在各個容量上的價錢](https://www.apple.com/tw/shop/buy-iphone/iphone-11-pro).....
 
-到這裡你也可以發現：**CBC**加密其實就是Blockchain的前身，這也給我們一個線索，既然中本聰知道CBC加密，那麼中本聰自己應該就是從事密碼學相關領域的工作！
+### SPV(Simplified Payment Verification) Node
 
-### 區塊鏈上的重放攻擊
+但有了Merkle Tree的協助，行動端的裝置可以只安裝SPV Node，裏頭只有每個Block的Header(約80個Bytes)，一但有檢查交易紀錄是否存在於某個區塊中，就去訪問Full Node並且索取該區塊的Merkle Tree以供驗證，這個方法又稱之為`Merkle Path Proof`。
 
-但在區塊鏈上也有所謂的重放攻擊，因為主鏈硬分岔之後的加密演算法、私鑰、公鑰通通都相同，所以攻擊者可以重現在另一條鏈上的交易(因為簽署或密文都可以在另外一條鏈找到，找到後就可以在其他鏈上發起同樣的交易)。避免重放攻擊的方法就是讓分岔後的每條鏈有自己獨立的ID，這樣就可以讓交易只在某特定ID的鏈上能夠被廣播。
+下面是中本聰在[白皮書](https://bitcoin.org/bitcoin.pdf)中所留的一段話
 
-可以點選[這裡](https://www.binance.vision/zt/security/what-is-a-replay-attack)了解相關資訊，也因此**了解區塊鏈之前必須先了解密碼學**。
+> A block header with no transactions would be about 80 bytes. If we suppose blocks are generated every 10 minutes, 80 bytes * 6 * 24 * 365 = 4.2MB per year. With computer systems typically selling with 2GB of RAM as of 2008, and Moore's Law predicting current growth of 1.2GB per year, storage should not be a problem even if the block headers must be kept in memory.
 
-# 編碼、壓縮、哈希、加密的比較
-
-終於把加密的內涵與幾個重要算法講解完畢，今日的最後讓我們簡單複習一下密碼學裏頭這四種詞彙代表的意涵：
-
-- 編碼：**雙向轉換**資料的儲存形式或內容
-- 壓縮：轉換後使資料的**儲存空間變小**，也可以解開回原先的檔案
-- 哈希：**單向**把不定長度的輸入變成固定長度的輸出
-- 加密：可以雙向轉換，但**只有特定的對象有辦法反向解開**而得到原本的資料
-
-![Example](https://www.lkm543.site/it_iron_man/day10_3.jpg)
+簡單翻譯就是：並非所有裝置都有足夠的資源當full node，但如果某些輕型裝置只有驗證或發送交易需求的話，那麼它並不需要儲存自創世塊以來的全部區塊的交易資料，只需要儲存每Block的標頭，這樣即使一年過去了，你的手機也只會增加4.2MB的資料！
 
 到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
-
 # Ref:
-- [維基百科-費斯妥密碼](https://zh.wikipedia.org/wiki/%E8%B4%B9%E6%96%AF%E5%A6%A5%E5%AF%86%E7%A0%81)
-- [Feistel Block Cipher](https://www.tutorialspoint.com/cryptography/feistel_block_cipher.htm)
-- [維基百科-資料加密標準](https://zh.wikipedia.org/wiki/%E8%B3%87%E6%96%99%E5%8A%A0%E5%AF%86%E6%A8%99%E6%BA%96)
-- [<Feistel Cipher> 費斯特密文](https://wiki.kmu.edu.tw/index.php/Feistel_cipher)
-- [AES五种加密模式（CBC、ECB、CTR、OCF、CFB）](https://www.cnblogs.com/starwolf/p/3365834.html)
-- [区块链中，什么是重放攻击，什么是重放保护呢？](http://blockgeek.com/t/topic/1518)
+- [Merkle Tree（默克爾樹）演算法解析](https://www.itread01.com/content/1544187062.html)
+- [維基百科-哈希樹](https://zh.wikipedia.org/zh-tw/%E5%93%88%E5%B8%8C%E6%A0%91)
+- [Wikipedia-Merkle Tree](https://en.bitcoinwiki.org/wiki/Merkle_tree)
+- [Why use Merkle Root (and not just concatonation of all hashes?](https://bitcoin.stackexchange.com/questions/76811/why-use-merkle-root-and-not-just-concatonation-of-all-hashes)
+- [Bitcoin: A Peer-to-Peer Electronic Cash System](https://bitcoin.org/bitcoin.pdf)
+- [What is the Merkle root?](https://bitcoin.stackexchange.com/questions/10479/what-is-the-merkle-root)
+- [Full Node和SPV Node如何驗證Transaction？](https://countchu2.blogspot.com/2017/03/full-nodespv-nodetransaction.html)
+- [Attacking Merkle Trees With a Second Preimage Attack](https://flawed.net.nz/2018/02/21/attacking-merkle-trees-with-a-second-preimage-attack)

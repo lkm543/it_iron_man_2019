@@ -1,196 +1,121 @@
-# Substitution-Permutation Network(SPN)
-SPN是Claude Shannon在1949年提出，Claude Shannon認為一個好的加密方法必須有這兩種特色：
+在講解完昨天的2種加密法─XOR Cipher與Substitution-Permutation Network(SPN)後，我們今天要來講解Feistel Cipher與區塊加密，講解完區塊加密後，你就可以發現區塊加密其實跟區塊鏈架構是一樣的！
 
-> Diffusion：將密文中有可能出現的統計結構消除，同時明文的一點小改變會讓密文產生很大的變化
-> Confusion：複雜化密文與金鑰間的關係
+# Feistel Cipher
+Feistel在1973所提出Feistel Cipher，幾乎被應用在所有區塊加密的演算法上(區塊加密是甚麼以下會再說明)，Feistel Cipher跟昨天提到的Substitution Permutation Network的精神很類似：用各種算法算很多輪來打散密文與明文間的關係，下圖是Feistel Cipher的演算法流程：
 
-我們昨天提到的One-Time Pad有這兩個特色，所以`One-Time Pad`也是唯一在金鑰安全的狀態下無法被解密的加密方法。至於為什麼要`Diffusion`與`Confusion`呢？
+![Feistel Cipher](https://www.tutorialspoint.com/cryptography/images/feistel_structure.jpg)
 
-Diffusion是為了避免密文可以透過詞頻等分析被解出來，就像是昨日我們提到的Monoalphabetic，即便Monoalphabetic在金鑰的複雜度上幾不可能被破譯，但是詞頻的統計結構可以逐步解開我們的轉換表，為了避免攻擊者可以透過語言中會出現的統計結構來破譯，所以在密文中出現的統計結構必須被消除。同時為了避免傳遞兩段類似文字的情形中被猜出加密方式與密鑰，也期望即便明文只有一些小變動也會使密文產生很大的變化。
+圖片來源：[tutorialspoint](https://www.tutorialspoint.com/cryptography/)
 
-Confusion是為了讓密文看起來更像隨機、無法被讀取，同時在金鑰洩漏的狀況下能夠有多一層保障，只要密文與金鑰間夠複雜，攻擊者只能不斷嘗試各種加密方式來是突破譯。
+Feistel Cipher首先會跟SPN一樣利用一把原始金鑰生成(回合數)個金鑰，隨後把明文切割成左右兩部分(L0與R0)，接著在每一回合中，依序在第N回合中對左右兩部分做：
 
-Diffusion跟Confusion兩者都是為了避免攻擊者在知道密文與明文的狀態下可以解出加密方式與金鑰，這種情形又可以稱之為[known-plaintext attack](https://en.wikipedia.org/wiki/Known-plaintext_attack)。
+1. 把右邊(RN)的的部分跟第N把金鑰作F函數的轉換(RN')
+2. 第一步驟轉換出來的結果(RN')再和這一回合的左邊做XOR運算便是新產生的右邊(RN+1=LN⊕RN')
+3. 接著再把此輪的右邊的原始資料直接當作下一輪的左邊(LN+1=RN)
 
-下面是一個基本的SPN算法，其中主要有代換、置換和輪金鑰混合三個步驟，在這裡我們先簡介一下代換、置換：
+與SPN相同，加解密都是利用相同的編碼方法，因此密文解密的過程即是把加密的過程反過來，即可。要注意的是F函數應該要有取代的功能(因為左右兩邊交換的過程中其實已經有置換，但沒有取代，取代應該要在F函數中被實做出來)，此外，F函數的設計也會影響到攻擊的難度，F函數越複雜，由密文拆解出明文就會越困難。
 
-- 代換：把明文的字母用另一個字母替換，我們昨日提到的Monoalphabetic就是代換法的應用。
+如果F函數用的是跟SPN同樣的s_box呢?這樣的話就很像我們昨天提到的SPN網路，但SPN網路在實務上比較容易被平行運算，在GPU或ASIC的運算上能夠很輕易的實現，但在嵌入式或是智慧卡上頭SPN就不太適用了。另外用s_box當作F函數其實就是我們之前提到的Data Encryption Standard(DES)。
 
-- 置換：調動字母的順序，我們昨日提到的Rail-Fence Ciphers就是置換法的應用。
 
-SPN的想法其實很好理解，既然單次的代換與置換都很容易被破譯，那麼代換跟置換都用總行了吧？單輪不夠的話，那重複加密很多輪，那如何解密呢？其實一樣解密很多輪就可以把最原始的明文解出來。
+# 串流加密 vs 區塊加密
 
-![SPN](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/SubstitutionPermutationNetwork2.png/540px-SubstitutionPermutationNetwork2.png)
+我們到目前為止提到的加密法都是對稱式加密，對稱式加密指的是加解密用的是同一把金鑰，而對稱式加密裏頭又可以分成：串流加密(stream cipher)與區塊加密(block cipher)。
 
-## SPN演算法實作
+串流加密是透過固定的算法與金鑰，對明文的位元逐個做加解密，也就是同一套模式從第一個字元運算到最後一個字元，好處是運算速度快，可以隨時隨著資料的輸入而加密，通常運用在通訊上。
 
-SPN演算法每次的輸入明文是固定的，為了簡化與方便後續的運算與表達，我們這裡把輸入SPN算法的位元數設定在16個位元。流程大概跟上圖顯示的一樣：
+區塊加密則不然，每個區塊加密都有**固定長度的輸入**，也就是區塊加密每次只能加密固定長度的資料，如果要加密的資料超出區塊加密法能夠加密的上限，就把原始資料切割成許多子資料後再分別加密；如果資料長度不足則需要補齊到區塊加密法能接收的長度。我們介紹的SPN或是Feistel Cipher因為都有固定長度的輸入，因此兩者都屬於區塊加密。
 
-> 明文→XOR Cipher(→S-boxes→P-boxes→XOR Cipher)*n→S-boxes→P-boxes→XOR Cipher→密文
+目前主流的加密方法都是區塊加密了，因此我們接下來對幾種區塊加密的方法做個簡介：
 
-其中(→S-boxes→P-boxes→XOR Cipher)\*n代表的是我們要重複做幾輪加密
+## Electronic codebook(ECB)
 
-### XOR Cipher
+在Electronic codebook(ECB)的模式中會根據區塊加密法每次能夠加密的資料大小把資料切割成許多獨立的區塊，每個區塊再獨立地被加解密，下面是它的流程圖：
 
-在`XOR Cipher`這裡我們可以直接把昨天寫好的函式拿過來使用。分別處理：產生金鑰、XOR運算、XOR加解密。只是因為SPN會做多組的XOR Cipher，所以SPN金鑰的產生方式是透過一組最初始的金鑰產生另外(回合數+1)組16bits的金鑰。
+加密
+![CBC Encryption](https://upload.wikimedia.org/wikipedia/commons/c/c4/Ecb_encryption.png)
 
-```python
-def generate_key(key, rounds):
-    key += key
-    keys = []
-    for idx in range(rounds):
-        key_this_round = key[4*idx+4:4*idx+20]
-        keys.append(key_this_round)
-    return keys
+圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
 
-def xor_operation(text, key):
-    if text == key:
-        return "0"
-    else:
-        return "1"
+解密
+![CBC Decryption](https://upload.wikimedia.org/wikipedia/commons/6/66/Ecb_decryption.png)
 
-def xor_en_decrypt(text, key):
-    result = ""
-    len_txt = len(text)
-    len_key = len(key)
-    for idx in range(0, len_txt):
-        if idx >= len_key:
-            key_idx = idx % len_key
-        else:
-            key_idx = idx
-        xor_result = xor_operation(text[idx], key[key_idx])
-        result += xor_result
-    return result
-```
+圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
 
-### S-boxes(替換盒)
+但ECB的缺陷就是包含同樣資訊的區塊會被加密成同樣的密文，使得Diffusion不足(無法保障密文與明文間的複雜)。
 
-替換盒這裡我們可以先產生一個隨機數列`s_box`，這個數列裏頭有0-15隨機散布而且不重複，它看起來會長成這樣：
+### 重放攻擊 
 
-> s_box = [4, 6, 15, 12, 5, 1, 3, 11, 14, 13, 0, 7, 9, 10, 8, 2]
+另外一個ECB模式的缺陷就是容易被**重放攻擊**(應念二聲ㄔㄨㄥˊ，重複的重)，意即因為每一個區塊都有獨立的訊息，即使攻擊者不知道加密方式與金鑰，只要攻擊者知道區塊的功能後也只需要重複傳遞該區塊，接收端便會誤認接收了多次相同的訊息，比方說其中一個區塊是匯款給他人，那麼攻擊者可以透過不斷傳遞該區塊的方式把使用者的餘額給提領光。
 
-這個數列的意思是：1用5替換掉、2用7替換掉、3用16替換掉....(記得索引值從0開始)，於是我們就可以進行替換了！實作方法如下：
+## Cipher-block chaining(CBC)
 
-```python
-def substitution(input, s_box):
-    output = ""
-    for idx in range(4):
-        data = input[4*idx:4*(idx+1)]
-        number = int(data, 2)
-        number_substitution = s_box[number]
-        # Convert to binary string
-        # ex: 9 -> "1001"
-        binary_number = ""
-        for i in range(3, -1, -1):
-            binary_number += str((number_substitution >> i) & 1)
+ECB模式的問題在於當我們紀錄連續資料時，容易被重放攻擊，同時也很難逐一驗證每個區塊資訊是否有被竄改過，因此Cipher-block chaining(CBC)便應運而生，在CBC模式中，每區塊的明文會先跟前一個密文區塊進行XOR運算後再加密。因為此時每個區塊的加密都會使用到前面所有區塊的參數，因此只要中間其中一個區塊被更改過，那麼便會輕易地被發現，下圖是它概要的加解密流程。
 
-        output += binary_number
-    return output
-```
+加密
+![CBC Encryption](https://upload.wikimedia.org/wikipedia/commons/d/d3/Cbc_encryption.png)
 
-### P-boxes(排列盒)
+圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
 
-排列盒這裡我們跟s_box用同樣方法產生一個隨機數列`p_box`：
+解密
+![CBC Decryption](https://upload.wikimedia.org/wikipedia/commons/6/66/Cbc_decryption.png)
 
-> p_box = [13, 3, 12, 1, 9, 8, 15, 4, 6, 5, 10, 14, 2, 0, 11, 7]
+圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#ECB)
 
-這代表：第1個bit要移動到第14個bit、第2個bit要移動到第4個bit、第3個bit要移動到第13個bit....實作方法如下
+到這裡你也可以發現：**CBC**加密其實就是Blockchain的前身，這也給我們一個線索，既然中本聰知道CBC加密，那麼中本聰自己應該就是從事密碼學相關領域的工作！
 
-``` python
-def permutation(input, p_box):
-    output = list("0" * 16)
-    for idx, value in enumerate(p_box):
-        output[value] = input[idx]
-    return "".join(output)
-```
+### 區塊鏈上的重放攻擊
 
-### 加密：重複XOR Cipher→S-boxes→P-boxes的步驟
+但在區塊鏈上也有所謂的重放攻擊，因為主鏈硬分岔之後的加密演算法、私鑰、公鑰通通都相同，所以攻擊者可以重現在另一條鏈上的交易(因為簽署或密文都可以在另外一條鏈找到，找到後就可以在其他鏈上發起同樣的交易)。避免重放攻擊的方法就是讓分岔後的每條鏈有自己獨立的ID，這樣就可以讓交易只在某特定ID的鏈上能夠被廣播。
 
-加密的過程中就不斷重複XOR Cipher→S-boxes→P-boxes的過程，每次進入XOR-Cipher的金鑰都不一樣，但每次s_box、p_box的參數都相同，注意這裡會因為XOR的步驟會因為頭尾都作而比s_box與p_box多進行一次。
+可以點選[這裡](https://www.binance.vision/zt/security/what-is-a-replay-attack)了解相關資訊，也因此**了解區塊鏈之前必須先了解密碼學**。
 
-```python
-def spn_encrypt(text, rounds, key, s_box, p_box):
-    output = text
-    for idx in range(rounds):
-        output = xor_en_decrypt(output, key[idx])
-        output = substitution(output, s_box)
-        output = permutation(output, p_box)
-    output = xor_en_decrypt(output, key[rounds])
-    return output
-```
+# 現代加密標準。
 
-### 解密：把加密的過程倒置過來
+今天的最後我們來簡單聊聊現代幾種加密的標準。
 
-這裡有兩點需要注意：xor_cipher使用的key必須倒置、s_box與p_box的參數也必須互換(原本如果是1替換成4，現在必須把4替換回1)，把加密的過程反過來作就可以解密了！
+## Data Encryption Standard(DES)
 
-```python
-def spn_decrypt(text, rounds, key, s_box, p_box):
-    output = text
-    s_box_inverse = [0]*16
-    p_box_inverse = [0]*16
-    for idx in range(16):
-        s_box_inverse[s_box[idx]] = idx
-        p_box_inverse[p_box[idx]] = idx
-    for idx in range(rounds):
-        output = xor_en_decrypt(output, key[rounds-idx])
-        output = permutation(output, p_box_inverse)
-        output = substitution(output, s_box_inverse)
-    output = xor_en_decrypt(output, key[0])
-    return output
-```
+DES使用7個8位元大小的位元組共56位元作為金鑰內容，也屬於區塊式密碼(block cipher，意即每次加密的長度是固定的，我們之後會再提及)，每次的輸入能夠加密64位元的明文，加密過程共有16輪，每輪都使用演算法從金鑰產生不同的子金鑰(subkey)來加密，也在1977年被美國國家標準局製定為標準，下面是DES加密的大概流程。
 
-### 測試一下加解密
+![DES](https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/DES-key-schedule.png/250px-DES-key-schedule.png)
 
-到這裡就可以測試我們的代換─置換網路是否可以正常運作了！
+圖片來源：[維基百科](https://zh.wikipedia.org/wiki/%E8%B3%87%E6%96%99%E5%8A%A0%E5%AF%86%E6%A8%99%E6%BA%96)
 
-```python
-if __name__ == '__main__':
-    rounds = 3
-    key = "1011101000111110"
-    keys = generate_key(key, rounds + 1)
-    print(f"初始金鑰： {key}")
-    print(f"產生金鑰： {keys}")
+### Triple DES(3DES)
 
-    s_box = random.sample(range(0, 16), 16)
-    print(f"s_box： {s_box}")
-    p_box = random.sample(range(0, 16), 16)
-    print(f"p_box： {p_box}")
+但隨著電腦硬體的飛速進步，早在1997年6月，Rocke Verser、Matt Curtin、Justin Dolske團隊就能透過暴力運算所有金鑰的2^56次方種可能來破解DES加密，1999年甚至有人能夠在一天內的時間就破解DES加密。DES此時非常需要一個替代方案來取代，但新方案的出現需要經過密碼學者的驗證與研究，產生新演算法的標準耗時而緩不濟急，因此過渡方案便是透過重複利用三次的DES加密、同時也把金鑰長度變成三倍，藉此在過渡階段避免對DES的攻擊。
 
-    message = "1001001110100101"
-    print(f"原始明文： {message}")
-    encryption = spn_encrypt(message, rounds, keys, s_box, p_box)
-    print(f"加密密文： {encryption}")
-    decryption = spn_decrypt(encryption, rounds, keys, s_box, p_box)
-    print(f"原始明文： {decryption}")
-```
+## Advanced Encryption Standard加密(AES)
 
-![SPN Demo](https://www.lkm543.site/it_iron_man/day12_1.jpg)
+因為過往的標準DES已無法提供足夠的安全性，國家標準暨技術研究院(National INstitute of Standards and Technology，NIST)在1997年9月12日向密碼學界徵求能夠替代DES的加密演算法，經過3年的驗證以後，Rijndael演算法最後入選成為進階加密標準(Advanced Encryption Standard，AES)。
 
-## 那SPN有滿足Diffusion跟Confusion嗎？
+也因為AES採用Rijndael演算法，所以AES有兩意義：標準或演算法。如果AES指的是演算法時，那麼AES演算法就是Rijndael演算法。
 
-首先回憶一下Diffusion跟Confusion這兩個詞代表的意思：
+### Rijndael演算法
 
-> Diffusion：將密文中有可能出現的統計結構消除，同時明文的一點小改變會讓密文產生很大的變化
-> Confusion：複雜化密文與金鑰間的關係
+Rijndael演算法由比利時學者Joan Daemen和Vincent Rijmen提出，因此Rijndael演算法的名稱就來自於兩位學者名字的融合，其特色是基於明天我們會詳細提到的`代換-置換網路(Substitution-permutation network，SPN)`的加密演算。也就是原始的明文會透過多次的加密與轉換後生成密文，大部分的加密演算法也都會透過重複多輪的加密與轉換來增加加密的安全性。
 
-首先是Diffusion，想像一下如果我們僅改變輸入明文的其中一個bit，則這個bit會被餵到s-box做替換，使跟這個bit同一組的數個bits通通被換掉，而後被傳入p-box做重新排序，等於所有的bit都有機會被更動到，而後又進到下一輪開始的s-box，如果其中只有一個位元被更動，那麼輸出的位元仍然會有相當大的變化！光說沒證據，那麼我們簡單用上面的程式碼做個實驗：
+# 編碼、壓縮、哈希、加密的比較
 
-> 原始明文： 1001001110100101
-> 加密密文： 0010000011101100
-> 原始明文： 1001001110100111
-> 加密密文： 1101110001110000
+終於把加密的內涵與幾個重要算法講解完畢，今日的最後讓我們簡單複習一下密碼學裏頭這四種詞彙代表的意涵：
 
-這裡我們對明文只做了一個bit的更動：1001001110100101→1001001110100111，但密文卻從0010000011101100→1101110001110000整整改變了10個bit！
+- 編碼：**雙向轉換**資料的儲存形式或內容
+- 壓縮：轉換後使資料的**儲存空間變小**，也可以解開回原先的檔案
+- 哈希：**單向**把不定長度的輸入變成固定長度的輸出
+- 加密：可以雙向轉換，但**只有特定的對象有辦法反向解開**而得到原本的資料
 
-Confusion的理由跟Diffusion類似，因為裏頭的bit通通被替換與重新排序了，密文與金鑰間的關係對外界來說自然是幾不可考了！
+![Example](https://www.lkm543.site/it_iron_man/day10_3.jpg)
 
-到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上，至於今天的程式碼則放在[這裡](https://github.com/lkm543/it_iron_man_2019/blob/master/code/day12.py)。
-
-# SPN與區塊鏈
-
-到這裡我們可以發現SPN每次能夠加密的長度都是固定的！而且SPN透過了多輪重複的加密來大幅提升破譯難度，這兩種特色也會在明天區塊加密中的介紹被提及，屆時就可以發現區塊鏈並不是一夕之間被發明出來的新技術，背後是由許多傳統的技術積累而構成的！
-
+到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
 # Ref:
-- [維基百科-代換-置換網路](https://zh.wikipedia.org/wiki/%E4%BB%A3%E6%8D%A2-%E7%BD%AE%E6%8D%A2%E7%BD%91%E7%BB%9C)
-- [密码学入门（一）：用Python实现对称加密算法](https://zhuanlan.zhihu.com/p/36262011)
-- [Chapter 2: 密碼學基礎](http://140.125.45.29/courses/files/network%20security/network%20security%20ch%202.pdf)
+- [維基百科-費斯妥密碼](https://zh.wikipedia.org/wiki/%E8%B4%B9%E6%96%AF%E5%A6%A5%E5%AF%86%E7%A0%81)
+- [Feistel Block Cipher](https://www.tutorialspoint.com/cryptography/feistel_block_cipher.htm)
+- [維基百科-資料加密標準](https://zh.wikipedia.org/wiki/%E8%B3%87%E6%96%99%E5%8A%A0%E5%AF%86%E6%A8%99%E6%BA%96)
+- [<Feistel Cipher> 費斯特密文](https://wiki.kmu.edu.tw/index.php/Feistel_cipher)
+- [AES五种加密模式（CBC、ECB、CTR、OCF、CFB）](https://www.cnblogs.com/starwolf/p/3365834.html)
+- [区块链中，什么是重放攻击，什么是重放保护呢？](http://blockgeek.com/t/topic/1518)
+- [維基百科-3DES](https://zh.wikipedia.org/wiki/3DES)
+- [DES 数据加密标准 结构详解](https://blog.csdn.net/jerry81333/article/details/78091145)
+- [AES標準及Rijndael演算法解析](https://www.itread01.com/content/1541892089.html)
+- [ 你的網路資訊真的安全嗎？美國政府公定「資料加密標準」首度被破解](https://panx.asia/archives/51155)

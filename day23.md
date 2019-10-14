@@ -1,120 +1,107 @@
-# 共識未能形成的小插曲：分岔
+# 升級之路上的岔路口
 
-分岔指的是在區塊鏈進行過程中因為某些特定原因沒能達成一致性的狀態，根據分岔的原因與相容性又可以分成暫時性分岔、軟分岔、硬分岔三種。首先我們先來談`暫時性分岔`：
+![Fork Road](https://www.danblewett.com/wp-content/uploads/2012/12/fork-in-the-road1-640x426.jpg)
 
-# 暫時性分岔(Temporary Fork)
+圖片來源：[danblewett](https://www.danblewett.com/the-necessity-of-failure-the-fork-in-the-road/)
 
-在P2P網路中節點間必須達成共識，並且每個節點所儲存的資料必須一致，而我們在昨天的`拜占庭將軍問題`中已經稍微講述了共識間的求取方式，但實際上網路資訊的廣播並不是即時的，其中的步驟可以簡化成：
+昨天我們提到網路廣播的延遲會產生不可避免的`暫時性分岔`，而今天要提的分岔則跟整個P2P網路的軟體升級有關。一般網站或APP升級都會由中心化伺服器負責軟體更新，或是派送新版本的軟體到用戶端要求用戶安裝。但去中心化的P2P網路則不同，因為每個節點都是獨立平等的存在，所以如果要更新目前運作的軟體版本，節點也有可能拒絕或是選擇另一個版本繼續運作，因此根據新版本在原本P2P網路中是否會互相排斥或是相容就會分成`軟分岔(Soft Fork)`與`硬分岔(Hard Fork)`。
 
-1. 挖掘到新區塊
-2. 廣播新區塊
-3. 其他節點收到廣播的新區塊
-4. 其他節點開始驗證新區塊
-5. 其餘節點接受區塊後放棄目前挖掘的區塊，開始挖掘下一塊
+軟分岔(Soft Fork)與硬分岔(Hard Fork)跟暫時性分岔有一個很大的不同：暫時性分岔不牽涉到程式碼或是協定的更動，只是因為網路延遲造成短期間無法同步所有資料的現象，而軟分岔(Soft Fork)與硬分岔(Hard Fork)則會**永久更動現行運作的程式碼**。更動程式碼的原因有很多，最常見的幾種分別是：
 
-![Temporary Fork](http://www.lkm543.site/it_iron_man/day23_1.jpg)
+1. 新增過去沒有的功能：
 
-因為網路與驗證哈希的運算都需要時間，因此在挖掘到新區塊到其餘節點驗證並接受該區塊會有一段時間上的落差，如果在這時間落差中有節點恰恰挖掘到另一個區塊(回憶一下挖礦所找尋的nonce並非是單一解)，整個區塊鏈網路就會進入`暫時性分岔`的階段，可以回憶一下之前的這張圖。
+    2012年3月份Bitcoin根據BIP16新增了[多重簽名](https://www.binance.vision/zt/security/what-is-a-multisig-wallet)的付款方式，詳情可以參考[這裡](https://en.bitcoin.it/wiki/Pay_to_script_hash)。
 
-![Temporaily Fork](https://www.lkm543.site/it_iron_man/day7_2.jpg)
+2. 回溯過去的資料：
 
-那既然暫時性分岔是POW機制與網路延遲下無可避免的結果，那區塊鏈該如何解決暫時性分岔並且回到同步的共識呢？
+    2016年DAO(the Decentralized Autonomous Organization)被盜走了360萬顆ETH，為了追回被盜取的ETH，採取硬分岔的方式回溯到資產轉移之前，相關[新聞報導](https://www.ithome.com.tw/news/107405)。
 
-## Bitcoin中的最長鏈機制
+3. 修改某部分運行的參數：
 
-Bitcoin的解決方式是`Winner Takes All`，最後只有一條最長的鏈會被當作主鏈，在工作量證明的機制下，通常擁有最多算力的那條鏈同時會擁有最快的出塊速度而成為最長鏈。
+    XMR為了對抗ASIC固定每半年會更新一次挖礦的參數。
 
-![Longest Chain](https://i1.wp.com/www.mangoresearch.co/wp-content/uploads/2018/06/Block3-LongestChain.png)
+既然軟分岔(Soft Fork)與硬分岔(Hard Fork)都跟節點運行的軟體升級有關，那麼首先來談談節點們又是如何決定升級的方向與內容呢？
 
-圖片來源：[mangoresearch](https://www.mangoresearch.co/blockchain-forks-explained/)
+## 從社群提案到接受
 
-那其餘因為太短被捨棄的區塊又稱為`孤兒塊(Orphan Block)`，挖到孤兒塊的節點會因為最後未能成為主鏈的一部分而被捨棄，其上的所有交易也會因此通通不算數，自然也沒有產生區塊的獎勵了！
+去中心化的區塊鏈並沒有權威的中心機構來決定未來升級的方向與內容，因此未來升級方向的提案、討論、決定都是仰賴社群意見的協助，為了凝聚社群共識與方便大家提案，社群也會在Github上開啟專門的Repository來標示各提案的內容，有意參與討論的人都可以在下自由留言。
 
-## Ethereum中的叔塊(Uncle block)機制
+### BIP(Bitcoin Improvement Proposals)
 
-但Bitcoin的平均出塊時間設定在十分鐘、Ethereum設定在15秒，兩者間的差距代表Ethereum出現暫時性分岔的機會與次數會遠遠多於Bitcoin。可以假設區塊從廣播到被接受都需要大概1秒的話，那麼Bitcoin出現孤兒塊的機會是1/600、Ethereum出現孤兒塊的機會是1/15。
+Bitcoin的改善協議稱為`Bitcoin Improvement Proposals(BIP)`，你可以到[Github](https://github.com/bitcoin/bips)上看到Bitcoin至今的所有BIP與社群的意見。BIP是社群間彼此溝通想法的方式，一旦議題被社群廣泛接受就會被收入BIP，下圖便是BIP收入後大致的運作流程與可能結果。
 
-Ethereum為了加速交易的認證與提升TPS而降低了出塊時間，也導致了孤塊比例的上升(實際上Ethereum的孤塊比例約落在6-8%上下，你可以到[這裡](https://www.etherchain.org/)查看最新的孤塊比例。)，所以如果同樣採用Bitcoin的最長鏈機制會造成礦工間的不公平，畢竟所挖出的區塊實際上也是合法的，只是因為廣播稍慢而沒辦法成為最長鏈。所以Ethereum透過的是另一種機制`叔塊(Uncle block)`來給予挖出叔塊的礦工比正常塊略少的獎勵。
+![BIP](https://en.bitcoin.it/w/images/en/e/ea/BIP_Workflow.png)
 
-### 叔塊如何被定義
+圖片來源：[Bitcoin Wiki](https://en.bitcoin.it/wiki/Bitcoin_Improvement_Proposals)
 
-首先我們必須定義叔塊是甚麼與叔塊名稱的由來，我們可以把暫時性分叉後主鏈所產生的第一個區塊稱為`父塊`，緊接著父塊的便是`子塊`，而暫時性分岔的支鏈上第一個區塊因為對於子塊來說是與父塊同輩份的，所以也稱為`叔塊`，但叔塊還有另一個條件就是**叔塊必須被後面的子區塊採用入主鏈**才能算是叔塊，否則便只能被丟棄而形成孤兒塊。：
+每個BIP在被當作草稿(`Draft`)提出後會有四種可能：被廣泛接受後被實作在鏈上(`Accepted`)、被社群拒絕(`Rejected`)、發起者自己撤銷提案(`Withdrawn`)、推遲提案(`Deferred`)。值得一提的是或許是開源社群的習慣，社群很少直接拒絕(Reject)某個提案，而通常以推遲(Deferred)或自行撤回(Withdrawn)的方式結束，少數幾個被Rejected例外就是想把區塊容量依照中本聰原本的想法擴容至2MB的[BIP109](https://github.com/bitcoin/bips/blob/master/bip-0109.mediawiki)，提出BIP109的是與中本聰一起參與過的Gavin Andresen，該次Reject也間接導致後續Bitcoin社群的分裂與BCH的分岔，甚至還有專人架設[網站](http://bip109.com/)聲援Bitcoin應該要照原本中本聰理想的實行BIP109。
 
-![Uncle Block](http://www.lkm543.site/it_iron_man/day23_2.jpg)
+### EIP(Ethereum Improvement Proposals)
 
-那為什麼會有人想把叔塊採用入主鏈？因為在主鏈上每採用一塊叔塊的礦工都能夠獲取`1/32`的出塊獎勵，透過獎勵機制去鼓勵主鏈上的礦工吸納叔塊！但Ethereum也限制每個區塊最多採用兩個叔塊為限。
+與Bitcoin的BIP類似，社群經過提案後會產生相對應的`Ethereum Improvement Proposals(EIP)`，Ethereum主要由乙太坊基金會在開發與維持社群，因此與Bitcoin不同的是在營運上較為中心化，官方對於EIP會發出相應的ERC討論。
 
-### 如何計算叔塊獎勵
+ERC的全名是`Ethereum Request for Comments`，就是徵求社群間的意見，此時ERC的編號與EIP通常會一致，最有名的EIP與ERC莫過於[ERC20](https://medium.com/myethacademy/%E5%88%B0%E5%BA%95%E4%BB%80%E9%BA%BC%E6%98%AFerc-20-49d052e8d290)成為代幣的標準並引發2017-2018年間的ICO熱潮，在[這裡](https://eips.ethereum.org/)你也可以看到所有的EIP列表。
 
-至於挖掘叔塊的礦工獎勵是如何計算的呢？這關係到叔塊是否有在暫時性分叉後的六代內被採納入主鏈，只有差距在六代內的叔塊會獲得獎勵，每間隔一層所獲得的出塊獎勵就會減少12.5%。
+## 軟分岔(Soft Fork)與硬分岔(Hard Fork)
 
-1. 間隔一層：87.5%出塊獎勵
-2. 間隔兩層：75.0%出塊獎勵
-3. 間隔三層：62.5%出塊獎勵
-4. 間隔四層：50.0%出塊獎勵
-5. 間隔五層：37.5%出塊獎勵
-6. 間隔六層：25.0%出塊獎勵
+在P2P網路中每個節點對於是否要接受新提案都是自由的，也就是每個節點所運行的區塊鏈版本不一定一致，在P2P網路中也可能會有多個版本共存，根據**是否要接受過去版本的資訊可以分成軟分岔(Soft Fork)與硬分岔(Hard Fork)**。
 
-關於代數的計算可以參考下圖：
+- 軟分岔(Soft Fork)─更新後仍然可以接受與過去版本間形成部份的共識
+- 硬分岔(Hard Fork)─更新後完全無法與舊版本形成共識
 
-![Uncle Block](http://www.lkm543.site/it_iron_man/day23_3.jpg)
+如果你對軟體有點概念的話，軟體開發中所講到的**向後相容**的概念(對過去的版本相容)就是軟分岔！
 
-但因為採納叔塊對於主鏈上的礦工也有益處，所以通常在兩至三代內叔塊就會被收入主鏈中，在[Nanopool](https://eth.nanopool.org/blocks)的出塊清單中你也可以看到由nanopool挖出的區塊中有哪些是叔塊、第幾代叔塊，其中`區塊序號_u代數`代表的便是叔塊(u即是Uncle的縮寫)！你也可以在[Etherscan](https://etherscan.io/chart/uncles)上看到每天產出叔塊的個數，平均每天會產出500塊左右的叔塊，高峰期甚至會超過一天2000塊。
+## 軟分岔(Soft Fork)
 
-### 叔塊對整體礦工的利益是好的嗎？
+軟分岔(Soft Fork)的定義是舊節點不升級也可以相容於部分的共識，因為共識可以在新舊版本間形成，所以**新舊版本可以共存在同一條鏈之上**。
 
-回憶一下我們在[Day04|打造一個簡易的區塊鏈(3)：難度調整與確認哈希鏈](https://ithelp.ithome.com.tw/articles/10215089)有寫到如何調控出塊難度：
+![Soft Fork](https://bitcoin.org/img/dev/en-soft-fork.svg)
 
-```
-if average_time_consumed > self.block_time:
-    self.difficulty -= 1
-else:
-    self.difficulty += 1
-```
+圖片來源：[mycryptopedia](https://www.mycryptopedia.com/hard-fork-soft-fork-explained/)
 
-也就是當實際的出塊時間長於設定值便減低難度，若短於設定值便增加難度；而Ethereum出塊難度的調控是根據**主鏈的出塊時間**來調控的，叔塊的礦工並不會被記入難度的調整之中，因此若有礦工挖掘叔塊便可以提升整體礦工的利益！
+軟分岔以**功能的更新**居多，亦即雖然可以相容在同一條鏈上，但舊版本會沒有辦法使用新版本所推出的功能，就像是你可以使用Word2017去開啟Word2013的檔案，但如果你仍然在使用Word2013就會沒辦法使用某些Word2017才有的新功能了。
 
-口說無憑，我們來做個簡單的計算：
+## 硬分岔(Hard Fork)
 
-#### 全部礦工只挖掘主鏈、也不採納叔塊
+硬分岔(Hard Fork)的定義是舊節點不升級就無法相容於新節點產生的共識，因為共識不能在新舊版本間形成，所以**新舊版本不能共存在同一條鏈之上**，所以一旦網路中還有兩種版本在運行，則兩種版本就會岔開分成兩條獨立的鏈，各走各的路。
 
-出塊獎勵為R，假設在全部礦工只挖掘主鏈時的出塊時間為T，單位時間內的總利益便是`R/T`，如果持有算力的N%，則單位時間的預期收益便是`R/T*N/100`。
+![Soft Fork](https://bitcoin.org/img/dev/en-hard-fork.svg)
 
-#### 有x%的礦工專門挖掘叔塊
+圖片來源：[mycryptopedia](https://www.mycryptopedia.com/hard-fork-soft-fork-explained/)
 
-為了方便計算，我們這裡假設每一區塊在下一代便後被收入主鏈中，對於挖掘出叔塊的礦工而言獎勵便是0.875\*R，因為有x%在負責挖掘叔塊，剩下(100-x)%便是在挖掘主鏈。對於兩種礦工而言：
+之所以新舊版本不能共存的原因通常在於**共識規則的更新**，如果未更新成新的共識規則會導致舊版本無法驗證新版本所產生的區塊。
 
-- 專門挖掘主鏈的礦工
+### IFO(Initail Fork Offering)
 
-剩下(100-x)%在挖掘礦工會因為只剩下(100-x)/100的總算力在挖掘主鏈，持有算力的N%的礦工預期出塊收益就會變成：`R/T*100/(100-x)*N/(100-x)`。另外每在主鏈上產生一個區塊後，平均會產生x/(100-x)個叔塊，因此外加採納叔塊的獎勵為`R/T/32*x/(100-x)*N/(100-x)`。
+因為P2P網路可自由進出的關係，單一節點也可以採取自行開發的新硬分岔版本而跟多數節點脫離。任何人也都可以分岔出屬於自己的區塊鏈，因此有一陣子因為ICO被法令限制的關係，IFO成為某些人手中的印鈔機─你可以可以輕易的分岔出一條區塊鏈然後把部分的挖礦所得直接配給自己(在[這裡](https://medium.com/@jordan.baczuk/how-to-fork-bitcoin-part-1-397598ef7e66)及[這裡](https://medium.com/@jordan.baczuk/how-to-fork-bitcoin-part-2-59b9eddb49a4)你可以學到如何岔出一條自己的Bitcoin)，雖然硬分岔在技術上是容易的，但分岔出的幣種市場是否能接受則仰賴市場上的共識了！實際上這些幣多半會因為流通量太低而成為一攤死水沒人理睬。
 
-總收益`R/T*100/(100-x)*N/(100-x)+R/T/32*x/(100-x)*N/(100-x)`會大於原本的`R/T*N/100`
+![XMR Fork](https://steemitimages.com/640x0/https://steemitimages.com/DQmZ7MngHG9gQm46of2CSfQTf71KbFC2CaYwFgdhUJLhELG/MoneroCoins.jpg)
 
-- 專門挖掘叔塊的礦工
+圖片來源：[steemit](https://steemit.com/monero/@cryptocurrencyhk/monero-monero)
 
-對於在側鏈上專門挖掘叔塊的礦工而言，同樣每在主鏈上產生一個區塊後，平均會產生`x/(100-x)`個叔塊，因此在側鏈上持有總算力的N%的礦工挖掘叔塊的獎勵為`R/T*0.875*x/(100-x)*N/x`，約分後可以得到`R/T*0.875/(100-x)*N`。
+像是為了因應XMR修改演算法對抗比特大陸的ASIC，許多社群與礦機商分岔出了Monero Classic(XMC)、Monero-Classic(XMC)、Monero 0(XMZ)及Monero Original(XMO)，不過這些分岔出的幣多半都在一攤死水的狀態了。在[這裡](https://steemit.com/monero/@cryptocurrencyhk/monero-monero)你可以看到更多進一步的消息。
 
-也就是當**挖掘叔塊的算力超過12.5%時**，挖掘叔塊的礦工也能夠取得比原本大家都擠在主鏈上更多的收益。
+### 歷史上知名的硬分岔
 
-## 51%攻擊
+歷史上最知名的兩次硬分岔莫過於[Ethereum Classic(ETC)](https://ethereumclassic.github.io/)自Ethereum分岔出與[Bitcoin Cash(BCH)](https://www.bitcoincash.org/)自Bitcoin分岔出的這兩段故事了。
 
-其中一種攻擊區塊鏈的方式便是透過暫時性分岔的特性，也就是先在主鏈上付款給別人後後迅速使用過半的算力挖掘另一個區塊，使的原本包含付款交易的區塊之後因為長度小於主鏈而被遺棄成為孤兒塊，裏頭付款的交易自然就不算數了。詳細運作流程可以參考下圖：
+#### ETC的分岔
 
-![51% Attack](https://miro.medium.com/max/4128/1*wsfcuDbXnSeVJHCA611oyg.png)
+ETC的分岔起因於Ethereum為了拯救在2016年6月17日[DAO被駭走的360萬顆ETH](https://www.ithome.com.tw/news/106614)而採取硬分岔回溯的行為，ETC的支持者認為這違反了區塊鏈不可竄改的精神，於是拒絕了Ethereum的提案留在舊鏈形成了Ethereum Classic(ETC)，真的說起來的話Ethereum Classic(ETC)才是真正的Ethereum。
 
-圖片來源：[Blockchain: how a 51% attack works (double spend attack)](https://medium.com/coinmonks/what-is-a-51-attack-or-double-spend-attack-aa108db63474)
+#### BCH的分岔
 
-51%攻擊需要取得整條鏈過半的算力才有可能達成，在[這個網站](https://www.exaking.com/51)中你可以看到每發起一小時51%攻擊所需要的成本，鏈上擁有的算力越多會造成攻擊者為了攻擊所需購入算力的成本越高，所以通常51%攻擊都是針對較為小眾的區塊鏈攻擊。
-
-像是ETC便因為算力不足曾經被51%攻擊過([相關報導](https://blockcast.it/2019/01/10/gateio-confirms-51-percent-attack-on-etc-promises-refunds/))，也因為算力的租借是以時間為單位的，增加入賬時所需要的確認區塊數可以有效增加發動51%攻擊的成本，但也會增加使用者所需要的等待時間。
-
-暫時性分岔的講解就到此為止，明天我們就要進入到區塊鏈升級過程中必定會經歷的軟分岔與硬分岔！
+BCH的分岔則是因為不認同目前把持Bitcoin發展方向的Core所規劃的未來藍圖([閃電網路](https://www.blocktempo.com/lightning-network/)、[隔離驗證](https://www.blocktempo.com/understand-segwit-in3mins/)等方向)，認為透過增加區塊容量到8MB就可以很容易解決目前TPS(Transactions per Second)過低的問題，也因此BCH新的共識規則便是8MB的區塊大小，但既然共識規則改變了，BCH新的共識規則自然無法相容於舊Bitcoin的1MB容量，於是兩者就分岔出不同鏈各走各的路了！
 
 到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
 
 # Ref:
-- [以太坊為什麼要設置區塊的叔塊獎勵？](https://kknews.cc/zh-tw/tech/3v35yzg.html)
-- [Uncle Rate and Transaction Fee Analysis](https://blog.ethereum.org/2016/10/31/uncle-rate-transaction-fee-analysis/)
-- [以太坊(Ethereum ETH)的奖励机制](https://zhuanlan.zhihu.com/p/28928827)
-- [比特幣、以太坊的一些問題介紹(一)](https://medium.com/taipei-ethereum-meetup/%E6%AF%94%E7%89%B9%E5%B9%A3-%E4%BB%A5%E5%A4%AA%E5%9D%8A%E7%9A%84%E4%B8%80%E4%BA%9B%E5%95%8F%E9%A1%8C%E4%BB%8B%E7%B4%B9-%E4%B8%80-5f4e07b9ca71)
-- [Uncle Mining, an Ethereum Consensus Protocol Flaw](https://bitslog.com/2016/04/28/uncle-mining-an-ethereum-consensus-protocol-flaw/)
+
+- [BlockchainHard ForkSoft Fork Blockchain Soft Fork & Hard Fork Explained](https://www.mycryptopedia.com/hard-fork-soft-fork-explained/)
+- [什麼是區塊鏈分叉? 什麼又是硬分叉/軟分叉?](https://medium.com/@crypto.peng/%E4%BB%80%E9%BA%BC%E6%98%AF%E5%8D%80%E5%A1%8A%E9%8F%88%E5%88%86%E5%8F%89-%E4%BB%80%E9%BA%BC%E5%8F%88%E6%98%AF%E7%A1%AC%E5%88%86%E5%8F%89-%E8%BB%9F%E5%88%86%E5%8F%89-2246d1d28d84)
+- [【硬塞科技字典】區塊鏈的分叉是什麼？還分為軟的和硬的？](https://www.inside.com.tw/article/13733-fork-soft-hard)
+- [How to Fork Bitcoin — Part 1](https://medium.com/@jordan.baczuk/how-to-fork-bitcoin-part-1-397598ef7e66)
+- [How to Fork Bitcoin — Part 2](https://medium.com/@jordan.baczuk/how-to-fork-bitcoin-part-2-59b9eddb49a4)
+- [Complete Guide on How to Create a New Alt Coin](https://bitcointalk.org/index.php?topic=225690.0)
+- [Wikipedia-List of bitcoin forks](https://en.wikipedia.org/wiki/List_of_bitcoin_forks)
+- [一文讀懂BIP、EIP、ERC等相關概念](https://kknews.cc/zh-tw/finance/mkbayb6.html)

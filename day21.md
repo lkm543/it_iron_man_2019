@@ -1,125 +1,140 @@
-# 傳統的網路架構
+# 拜占庭將軍問題
 
-![Client–server model](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Client-server-model.svg/1920px-Client-server-model.svg.png)
+拜占庭將軍問題在[維基百科](https://zh.wikipedia.org/zh-tw/%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98)中的說明如下：
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Client%E2%80%93server_model)
+> 一組拜占庭將軍分別各率領一支軍隊共同圍困一座城市。為了簡化問題，將各支軍隊的行動策略限定為進攻或撤離兩種。因為部分軍隊進攻部分軍隊撤離可能會造成災難性後果，因此各位將軍必須通過投票來達成一致策略，即所有軍隊一起進攻或所有軍隊一起撤離。因為各位將軍分處城市不同方向，他們只能通過信使互相聯絡。在投票過程中每位將軍都將自己投票給進攻還是撤退的資訊通過信使分別通知其他所有將軍，這樣一來每位將軍根據自己的投票和其他所有將軍送來的資訊就可以知道共同的投票結果而決定行動策略。
 
-傳統的網路架構是每一張圖片、影片、網站、APP都會有存放的伺服器(`server`)，每個伺服器會有自己像門牌一般的ip位址，當我們(`client`)瀏覽網頁時，其實就是透過ip位址向伺服器發出請求(request)，再由伺服器回傳我們瀏覽網頁上的資源(圖片、影片、html等)給我們。可以說伺服器本身掌控了話語權，也決定了我們能看到甚麼。
+![Byzantine Generals](https://steemitimages.com/640x0/http://www.medievalists.net/wp-content/uploads/2014/09/Byzantine-Military-Advice.jpg)
 
-因此傳統的架構又稱為`Client–Server model`。
+圖片來源：[steemit](https://steemit.com/blockchain/@dantheman/the-problem-with-byzantine-generals)
 
-以facebook為例，你在facebook的所有帳戶、照片、好友資料通通都存在facebook的伺服器中，facebook也有權力決定要給你看到/看不到甚麼，所以與其說是你的帳戶，不如說是facebook擁有你自願上傳的資訊，當你有需求時再順道回傳給你一份罷了。
+拜占庭將軍問題的背景可以簡化成三件事情：
 
-![Centralized](https://www.dcsorg.com/images/centralized-management.jpg)
+1. 將軍中可能出現叛徒，故意投不適當的策略，也不會依照投票的結果行動
+2. 傳遞過程中叛徒可能會以其他將軍的身分傳遞假資料給其他忠誠的將軍
+3. 傳遞過程中的信使可能會被攔截
 
-圖片來源：[Digital Currency Systems](https://www.dcsorg.com/centralized-management.php/)
+因此拜占庭將軍問題的核心就是如何在有叛徒或是資訊有可能遺失的情形下，找出方法讓忠誠的將軍們仍然可以**不受叛徒影響取得共識並且發動集體一致的行動**。
 
-所以傳統的中心化架構就是所有使用者的請求都會被送到同一個伺服器處理。另一個中心化的例子就是銀行的金流系統，當我們要匯款時便是向銀行的伺服器發出請求，請伺服器驗證我們的身分並且針對我們的請求加以處理，同時我們也信任伺服器的處理結果，整個流程都由銀行端完成。
+# 拜占庭將軍問題與區塊鏈
 
-這種架構的優點就是處理迅速，我們只需要等待單一伺服器的回應就可以知道結果。但其中卻有兩大缺陷：
+那麼拜占庭將軍問題究竟跟區塊鏈有甚麼關係呢？
 
-## Scalability
+## 女巫攻擊(Sybil Attack)
 
-Scalability代表的是可擴充性，也就是當使用者的數目成長時，系統接收並處理請求的伺服器數目卻是固定的，固定的伺服器規格代表能處理的使用者數目或是單位時間內的請求數是會有上限的，如果想要拉高上限，代表的是營運成本也會跟著上升(但其實近年因為硬體的進步與分散式系統的發達已經很大解決Scalability的問題了)。
+還記得我們在[Day07|打造一個簡易的區塊鏈(6)：節點間的同步與廣播](https://ithelp.ithome.com.tw/articles/10216373)中有寫到節點的加入是完全自由、不需要任何人允許，但這樣自由開放、沒有審核的環境就可能會有攻擊者冒充節點並且廣播對自己有利的資訊。
 
-## Reliability
+就像1973年的小說《Sybil》裏頭化名Sybil Dorsett的女主角因為認同障礙有16種人格一樣，單一攻擊者可以假冒惡意節點，並且分裂出多重身份藉此向其他正常節點提供大量不正確的資訊以癱瘓網路或是取得利益，這類在P2P網路中偽造多重身分藉此發動攻擊的方式又稱為`女巫攻擊(Sybil Attack)`。
 
-Reliability代表的是系統的可靠度，也就是系統的妥善率有多少。傳統的`Client–Server model`仰賴單一伺服器與節點的運行，所以一旦伺服器出錯或是維修，整個服務就會終止，也因如此我們偶爾還是會聽到facebbok斷線或是銀行服務會有固定的停止服務時間等等。
+為了對抗女巫攻擊，區塊鏈上的節點們必須在節點裏藏有攻擊者的狀況下加以應對並且求取正常節點間的共識；所以，區塊鏈或P2P網路中求取共識的本質便跟拜占庭將軍問題一樣。
 
-# Peer to Peer(P2P)網路
+![Sybil Attack](https://www.yourgenome.org/sites/default/files/styles/banner/public/banners/facts/what-is-clone-by-clone-sequencing/clonebyclone-01.jpg?itok=i8P7sq8Q)
 
-傳統的網站架構是把所有的資源都放置在同一台伺服器上，有需要的用戶再向伺服器檢索。Peer to Peer(P2P)網路則是網路上的所有人都負責儲存了全部或部分的所有資料，除了向其他IP位址發起請求外，本身也需要負責處理收到的請求，**自身既是Client也是Server**。
+圖片來源：[yourgenome](https://www.yourgenome.org/facts/what-is-clone-by-clone-sequencing)
 
-但其實P2P網路並非是非常新的概念，在常聽到的[TCP/IP通訊協定](https://zh.wikipedia.org/zh-tw/TCP/IP%E5%8D%8F%E8%AE%AE%E6%97%8F)中其實就是一種終端到終端(end to end)的概念，通訊的兩端是彼此平等不分client與server的！只是因為實務上我們上網幾乎都是在檢索其他網站的資料，為了效率與實務上應用的考量網站經營者才會把所有資源集中存放與處理。
+## 誰有權利投票?
 
-![P2P](https://www.skalex.io/wp-content/uploads/2017/06/p2p-web-model-transparent.png)
+為了對抗女巫攻擊，最基礎的方式就是讓**P2P網路中的廣播與投票是有成本的**，也就是你必須持有特定東西去證明你有廣播與投票的權利，至於用甚麼東西來證明自己主要又可以區分成兩種方式：
 
-圖片來源：[https://www.skalex.io](https://www.skalex.io/blockchain-p2p-web/)
+### 工作量證明(Proof of Work，POW)
 
-P2P網路在Scalability與Reliability都具有很大的優勢，因為每個獨立的終端都可以視作Server，當終端數目增加，Server數目也隨之增加，所有可運用的硬體資源與網路頻寬也隨之增加，在Scalability會具有很大的優勢。而Reliability的部分因為每個終端都可以獨立運作，所以不存在傳統中心化架構中一旦單一伺服器停擺就會造成整個服務中斷的問題。
+`工作量證明`指的是如果你想要廣播或是投票，你手中必須持有一定的運算力，回憶一下我們之前挖掘區塊的過程：
 
-除了Scalability與Reliability外，P2P網路也因為沒有中心化的伺服器，而讓資料沒有被中心化機構掌控或修改的可能，也確保了資訊的安全。
+```python
+while new_block.hash[0: self.difficulty] != '0' * self.difficulty:
+    new_block.nonce += 1
+    new_block.hash = self.get_hash(new_block, new_block.nonce)
+```
 
-## P2P網路的難題
+如果節點需要廣播資訊，它必須透過不斷搜尋nonce值來完成要求，也就是透過自身的工作量來證明自己廣播的權力，即便生成一個假冒節點的成本低廉，攻擊者可以藉此偽造無數個節點，但產生出的假節點會因為沒有運算力支持無法進行廣播，如果攻擊者想要發動女巫攻擊就必須耗費大量硬體資源取得運算力，大大提高了女巫攻擊的難度。
 
-雖然P2P網路可以有效解決傳統中心化網路在Scalability與Reliability的問題，但在技術上因為需要參照與協調許多終端所以技術的複雜度會比傳統Client–Server model複雜。以下簡述幾種P2P網路實作上的難題。
+雖然工作量證明能夠有效地抵制女巫攻擊，但在區塊鏈上也會產生未來發展路線被礦池/礦工把持的問題，也就是說你手上的幣未來會如何是完全被礦工/礦池決定的，一般持有幣的人並沒有辦法參與或是決定，這就利益的考量而言是衝突的，因為通常持有幣的人才會擁有動機去維持區塊鏈的可靠與可信度，如果礦工手上沒有幣，或是未來挖礦的利潤不斷下滑，就有可能發生礦工反過來攻擊區塊鏈一次獲取超額利潤殺雞取卵的事件。
 
-### 工作的分配
+### 權益證明(Proof of Stake，POS)
 
-雖然P2P網路的硬體資源與頻寬會隨著終端數目的增加而增加，但如何配置與分享彼此間閒置的資源是一大難題，畢竟即便資源增加，若沒有好好地被分配與利用也是徒然。以下簡述幾種工作分配的方式：
+因此另一種`權益證明`便應運而生，權益證明的目的是把廣播與投票的權力改成由持幣者來行使，也就是你手上持有的幣數越多，你會越有權力去廣播與投票，藉此透過自身的利益來維護區塊鏈的穩定。關於POS的詳情我們之後會另外開一章單獨說明。
+# 拜占庭容錯(BFT)演算法
 
-#### Opportunistic Load Balancing(OLB)
+Leslie Lamport在1982年發表*The Byzantine Generals Problem*([論文連結](https://people.eecs.berkeley.edu/~luca/cs174/byzantine.pdf))，提出了一個虛構模型來模擬異質系統中共識的形成，並且提出了拜占庭容錯演算法試圖在節點中求取共識。
 
-Opportunistic Load Balancing是將目前的工作隨意分配給一台閒置的電腦，目標是讓所有的電腦都處於工作的狀態，但因為沒有考量每個工作的工作量與每台電腦獨立且不同的運算能力，所以不適用於由異質終端所構成的P2P網路。
+因為Bitcoin中的節點彼此間是完全相同的，舉個例子：目前存在有三個獨立的節點，其中一個是由攻擊者(叛徒)假冒成的，但接收指令的正常節點(忠誠)並沒有能力區分此時的真實命令為何。
 
-#### Minimum Execution Time(MET)
+![BFT Demo 1](http://www.lkm543.site/it_iron_man/day22_1.JPG)
 
-Minimum Execution Time是不考慮電腦目前的工作狀態，直接把這項工作分配給執行時間最短的電腦，但缺點是會造成負載的不平衡，運算能力最強的電腦會被分派到最多工作，運算能力最弱的就會一直閒置，所以同樣不適用於由異質終端所構成的P2P網路。
+但若存在有四個獨立的節點，其中只有一個是由攻擊者(叛徒)假冒成的，此時接收指令的正常節點(忠誠)有能力區分此時的真實命令為何、並且找出哪個節點是由攻擊者假冒而成的。
 
-#### Minimum Completion Time(MET)
+![BFT Demo 2](http://www.lkm543.site/it_iron_man/day22_2.JPG)
 
-Minimum Completion Time是根據電腦的最小完成時間(目前的工作要多久才會結束)來分派工作，越快結束的電腦就會被優先指派然後計算，所以並不保證執行時間(Execution Time)會最短。
-
-#### Min-Min
-
-Min-Min是根據工作在每一台電腦預估可以完成的時間，所以也會將電腦目前的工作狀態列入考量。完成時間的意思便是等待時間加上執行時間(上面的Execution Time)，所以雖然能確保工作能在最短時間內被完成，但預估完成時間也是難事。
-
-### 節點的搜尋
-
-既然P2P網路是由許多獨立的Peer所構成，那要怎麼知道參與網路的節點確切的ip位址呢？你只能透過一些中心化的網站或是上網搜尋其他人提供的節點位置，比方說[這個網站](https://bitnodes.earn.com/)就記錄了Bitcoin網路線上的所有節點(下圖)，找到節點們的資訊後你才能參與整個P2P網路的運作。
-
-![Peer Location](https://www.lkm543.site/it_iron_man/day21_1.JPG)
-
-圖片擷取自：[bitnodes](https://bitnodes.earn.com/)
-
-### 取得Peer間的共識
-
-另一個P2P網路的難題是要取得終端/節點間的共識，P2P網路間必須共享同一份資料與彼此間的資訊才能夠協作，且因為TCP/IP的網路是兩兩連接而成的，由簡單的排列組合可以得知當節點有N個時，所有節點可以組成的連線個數便是CN取2，就是N\*(N-1)，大約取決於N^2，這在節點數一多的狀況下要取得Peer間的共識會非常困難，更何況有時候會有惡意的節點加入並且散步造假過的資訊，我們明日會在根據拜占庭將軍問題詳談如何解決這個問題。
+傳統拜占庭容錯演算法是透過節點兩兩間的聯繫來確認彼此的共識，問題就是**需要的運算量非常龐大而難以被實用**：以昨天提到的CN取2為例，假設目前有N個節點，每個節點都需要取得其他N-1個節點的訊息才能夠確認下一步的動作，也就是整個網路需要`N*(N-1)`的溝通數目才能進行下一步動作。也就是演算法中的O(n\*n)：當節點數目數目變成N倍，整體運算量就會變成N^2倍。
 
 ![https://chart.googleapis.com/chart?cht=tx&chl=C%5EN_2%3DN!%2F(k*(N-2)!)%3DN*(N-1)](https://chart.googleapis.com/chart?cht=tx&chl=C%5EN_2%3DN!%2F(k*(N-2)!)%3DN*(N-1))
 
-### 無法徹底去中心化
+在此補充一點，在Bitcoin的工作量證明機制下，上述的節點都必須有相同的運算能力，也就是拜占庭容錯演算法提供了工作量證明外的另一層安全保障。
 
-最後一個問題是P2P網路雖然可以稍微擺脫被單一中心化機構掌控資源的風險，但實際上P2P網路沒有辦法達到完全的去中心化，原因是網路提供商ISP或是[DNS](https://zh.wikipedia.org/zh-tw/%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F)還是掌控在中心化機構手中，像是上面節點的搜尋也需要仰賴別人提供的資訊，因此充其也只是最後資訊的儲存與處理是去中心化，底層的通訊還是得仰賴特殊的機構完成。
+## 證明拜占庭容錯機制
 
-### 資料的重複儲存與不穩定性
+Leslie Lamport等人在1980年發表[《Reaching agreement in the presence of faults》](https://lamport.azurewebsites.net/pubs/reaching.pdf)中證明，當網路中由攻擊者假冒的節點不超過1/3時，拜占庭容錯演可以有效揪出由攻擊者假冒的節點。但如果由攻擊者假冒的節點超過總數的1/3，就無法保證正常節點間能夠達到共識。換算成數學式就是：
 
-因為P2P網路的節點是可以自由加入與退出的，也就是每個節點的穩定性並無法確認，也無法得知每個節點可存續的時間，為了求取資料的安全便需要在複數個位置上儲存同樣的資料，相較於中心化網路會多耗費許多空間，即便如此在儲存使用者分享的檔案時也無法確保該檔案能存在多久。
+> N≧3F+1
 
-## P2P網路的分類
+其中N代表節點總數，F則是攻擊者假冒的節點數目，如果N大於或等於3F+1，則拜占庭容錯演算法便可以揪出整個網路的異常。我們可以做個簡單證明，此時根據提案方式可以分成兩種情形：
 
-根據P2P網路處理資訊與分配工作的方式大致又可以分成三種：
+- 發起行動者(提案節點)是由正常節點
+- 發起行動者(提案節點)是由攻擊者假冒
 
-![P2P Category](https://www.researchgate.net/profile/Taoufik_Yeferny/publication/332539196/figure/fig2/AS:749686013034497@1555750482262/P2P-architectures-at-a-glance-a-Centralized-architecture-b-Pure-P2P-architecture.png)
+當提案節點是正常節點時，當它把提案廣播出去時，整個網路會有至少N-F份正常訊息與至多F份錯誤訊息在網路中流傳，此時正確訊息必須多餘假冒的訊息N-F>F，也就是N必須大於2F
 
-圖片來源：[P2P architectures at a glance.](https://www.researchgate.net/figure/P2P-architectures-at-a-glance-a-Centralized-architecture-b-Pure-P2P-architecture_fig2_332539196)
+> N\>2F
 
-### 中央式P2P
+但當提案節點是由攻擊者假冒時，攻擊者會盡量拆散正常節點所接受到的資訊，也就是其中一半的正常節點(N-F)/2會接收到提案、另外一半的節點(N-F)/2卻會收到相反的提案，至於剩餘的攻擊者F-1的訊息是不確定的(攻擊者會干擾共識的形成)。為了達成共識，正常節點此時必須詢問其他節點所收到的資訊為何來確認共識與該訊息是否是被攻擊者偽造出來的，要使共識形成必須讓正常節點收到資訊多餘被偽造出來的，也就是N-F個正常節點減去F個假資訊後仍然必須大於F個假節點，(N-F)-F>F，所以可以導出總節點個數N必須大於3倍的假節點F。
 
-也就是上圖的(a)，代表整個P2P有一個中心伺服器專責處理工作的分派與分流，也會記錄節點們的清單與位置，但中心節點並不實際處理資訊或是資料的儲存，只負責節點間的溝通與工作的調度。
+> (N-F)-F\>F
 
-### 純P2P
+確切的證明可以參考[論文原文](https://lamport.azurewebsites.net/pubs/reaching.pdf)。
 
-純P2P代表整個P2P網路中的節點都是平等的，彼此並沒有工作或是權力上的分別，也就是上圖的(b)。
+# 實用拜占庭容錯(PBFT)
+Miguel Castro和Barbara Liskov在1999年發表了[《Practical Byzantine Fault Tolerance and Proactive Recovery》](http://www.pmg.csail.mit.edu/papers/bft-tocs.pdf)，其中提出的`實用拜占庭容錯(PBFT)演算法`把拜占庭容錯演算法的運算複雜度從指數降低到了多項式級，複雜度的大幅度降低讓拜占庭容錯演算法有實際應用的機會。
 
-### 混合 p2p
+## 實用拜占庭容錯(PBFT)的步驟
 
-混合式P2P很像是中央式P2P，但其跟中央式P2P網路不同的地方是它擁有複數個中心伺服器負責資訊的轉發與協調，[EOS](https://eos.io/)本身就擁有了21個超級節點。
+實用拜占庭容錯(PBFT)演算法改善了傳統必須彼此迭代詢問彼此收到資訊的情形，透過三階段投票與回應的設計，大幅度減少需要使用的運算量。
 
-# P2P與區塊鏈
+![PBFT](https://i1.wp.com/itsblockchain.com/wp-content/uploads/2017/02/hotdep_img_1.jpg?w=562&ssl=1)
 
-整個Bitcoin全節點可以看作是一種純P2P網路，節點間並沒有先來後到之分，但為了保持資料的一致性(所有節點手上的帳本必須同步)，所以在傳遞或廣播上必須考量到效率與攻擊者假造節點的狀況，因此我們明天就要來介紹究竟在P2P網路中要如何確保節點間的同步與讓正確的共識被形成呢？
+圖片來源：[itsblockchain](https://itsblockchain.com/practical-byzantine-fault-tolerance-algorithm-pbft-consensus/)
+
+以下以區塊鏈為例簡述三個PBFT的步驟：
+
+### Pre-prepare
+
+由客戶端(`Client`)向其中一個節點發起交易的請求，接收到請求的節點會傳遞交易請求給其餘節點，並且經過自己私鑰的數位簽章(我們之前提到的非對稱加密)來證明該訊息是由自己發出的，發送後進入就位(`Pre-prepare`)狀態，此時的資訊是由單一節點傳達給全部節點的。
+
+### Prepare
+
+當其餘節點收到發出的就位(`Pre-prepare`)訊息後必須馬上決定是否同意這個請求，如果同意就同樣利用自身的私鑰簽章後發出自己的預備(`Prepare`)給其他將軍，不同意就不做任何事情。如果自其他節點那收到足夠多的預備(`Prepare`)就代表，此後進入已預備(`Prepared`)的階段。
+
+### Commit
+
+如果已預備(`Prepared`)的節點準備執行該請求，就發送自身私鑰簽數位簽章執行(`Commit`)訊息給所有節點並進入執行階段，若各節點收到執行(`Commit`)訊息就執行該請求的內容，並且達成共識。
+
+## PBFT的小總結
+
+上述的`Pre-prepare`階段可以看做單一節點對所有節點的廣播與提案，`Prepare`階段可以看做是每個節點是否同意這個請求，而每個階段所收到的回應個數至少需要超過前面所提到的總節點數目的2/3。那為什麼是三階段而不是兩階段(Pre-prepare跟Prepared)後行動呢？
+
+這必須考慮到`視域變換(View-change)`，也就是避免發起者是攻擊者造假的，必須不停更換每一輪行動的最初發起者，因此Commit階段的目的便是要避免因為網路傳遞的延遲而使得部分節點進入視域變換的過程而導致錯誤的行動。詳細資訊可以參考[Taipei Ethereum Meetup](https://medium.com/taipei-ethereum-meetup/intro-to-pbft-31187f255e68)的專欄。
+
+# 共識的形成與岔開
+
+今天提到的都是節點間要如何產生行動上一致的共識，通常是在往常的交易或挖掘新區塊而需要達到彼此的一致性，但有時候會因為網路延遲的關係產生短暫的分裂，又或是社群意見的分裂使得此時並不需要繼續再按照節點間的共識採取行動，如何應對這些不同種類的分岔就是我們明後天要討論的議題了！
 
 到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
-
 # Ref:
-- [Peer-to-Peer (P2P) System](https://sls.weco.net/node/12916)
-- [P2P-顛覆網際網路傳統觀念](http://bm.nsysu.edu.tw/tutorial/htt/dkl/SearchEngine-nsysu041230.pdf)
-- [Wikipedia-Client–server model](https://en.wikipedia.org/wiki/Client%E2%80%93server_model)
-- [P2P的網路共享世界](https://dannylin3000.pixnet.net/blog/post/31271397-p2p%E7%9A%84%E7%B6%B2%E8%B7%AF%E5%85%B1%E4%BA%AB%E4%B8%96%E7%95%8C)
-- [P2P對等網路技術原理整合](https://www.itread01.com/content/1546608974.html)
-- [P2P原理以及如何实现（整理）](https://blog.csdn.net/qq_33850438/article/details/79700133)
-- [以兩階段排程演算法提昇動態階層式點對點網路拓樸之負載平衡](http://ir.lib.cyut.edu.tw:8080/bitstream/310901800/6479/1/Two+phases+scheduling+in+P2P.pdf)
-- [詳解區塊鏈P2P網路](https://www.itread01.com/content/1545529340.html)
-- [Towards Efficient Simulation of Large Scale P2P Networks](https://slideplayer.com/slide/4806764/)
-- [點對點網際網路技術(P2P)和軟體之概論](https://www.shs.edu.tw/works/essay/2008/10/2008103101062756.pdf)
+- [了解区块链的基本（第一部分）：拜占庭容错(Byzantine Fault Tolerance)](https://medium.com/loom-network-chinese/%E4%BA%86%E8%A7%A3%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%9F%BA%E6%9C%AC-%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86-%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99-byzantine-fault-tolerance-8a1912c311ba)
+- [維基百科-拜占庭將軍問題](https://zh.wikipedia.org/zh-tw/%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98)
+- [拜占庭容錯的解釋](https://www.binance.vision/zt/blockchain/byzantine-fault-tolerance-explained)
+- [【羅斯福專欄】拜占庭將軍怎麼打的勝仗？以鋼鐵人為例](https://medium.com/mibinews/%E7%BE%85%E6%96%AF%E7%A6%8F%E5%B0%88%E6%AC%84-%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%87%E8%BB%8D%E6%80%8E%E9%BA%BC%E6%89%93%E7%9A%84%E5%8B%9D%E4%BB%97-a51f6c39a760)
+- [聽過拜占庭將軍問題，有聽過拜占庭容錯算法嗎？](https://kknews.cc/zh-tw/history/ng3vj55.html)
+- [The Problem with Byzantine Generals](https://steemit.com/blockchain/@dantheman/the-problem-with-byzantine-generals)
+- [若想搞懂區塊鏈就不能忽視的經典：PBFT](https://medium.com/taipei-ethereum-meetup/intro-to-pbft-31187f255e68)
+- [區塊鏈技術指南](https://poweichen.gitbook.io/blockchain-guide-zh/)
+- [什麼是Sybil Attack女巫攻擊？](https://kknews.cc/zh-tw/news/5bgk993.html)
