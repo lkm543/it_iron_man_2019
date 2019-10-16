@@ -128,6 +128,7 @@ Miguel Castro和Barbara Liskov在1999年發表了[《Practical Byzantine Fault T
 今天提到的都是節點間要如何產生行動上一致的共識，通常是在往常的交易或挖掘新區塊而需要達到彼此的一致性，但有時候會因為網路延遲的關係產生短暫的分裂，又或是社群意見的分裂使得此時並不需要繼續再按照節點間的共識採取行動，如何應對這些不同種類的分岔就是我們明後天要討論的議題了！
 
 到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
+
 # Ref:
 - [了解区块链的基本（第一部分）：拜占庭容错(Byzantine Fault Tolerance)](https://medium.com/loom-network-chinese/%E4%BA%86%E8%A7%A3%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%9F%BA%E6%9C%AC-%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86-%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99-byzantine-fault-tolerance-8a1912c311ba)
 - [維基百科-拜占庭將軍問題](https://zh.wikipedia.org/zh-tw/%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98)
