@@ -1,140 +1,87 @@
-# Bitcoin被ASIC攻陷
+# 如何開始挖礦
 
-對於Bitcoin而言，一個合規的`nonce`是這樣被尋找到的：透過不斷改變`nonce`的值再跟前一個區塊的hash(`previous_hash`)、所有交易的hash值構成merkle tree的根`merkle_root`透過SHA-256函式計算哈希值後確認是否合規，直到找到一個合規的`found_hash`為止(為了方便舉例，除了這三個輸入參數外的都先忽略)。
+今天我們來簡單談一下如何挖礦，以及如果有興趣要挖礦的話該怎麼開始以及有那些眉角需要注意！
 
-> found_hash = sha256(previous_hash, merkle_root, nonce)
+## 選擇幣種/演算法
 
-也因此運算的瓶頸就在Bitcoin所使用的`SHA-256`演算法，如果能夠在同一時間大量、重複的運算就可以在挖礦中取得極大的優勢，因此這種計算方式極度適合ASIC，也導致了在`ASIC`進入挖礦市場後便迅速成為了Bitcoin的主流挖礦硬體，徹底把家用CPU/GPU從這場挖礦大戰中掃了出去。
+參與挖礦的第一步就是選擇想要挖的幣種，現在主流可以挖的幣有BTC、ETH、ZEC、ZCL、XMR、DASH、DCR等，雖說幣種繁多，但只要想挖的幣種使用的演算法是相同的，便可以隨意切換而且算力不會受到任何影響，用演算法區分會比較適當。其中又可以分成三種主流的挖礦方式：ASIC挖礦、Nicehash挖礦以及GPU挖礦。
 
-![ASIC](http://file.bitmain.com/shop-image-storage/product/2019/06/18/13/4dc4346f-23df-491e-aa8e-f0543dc79f3d_540.png)
-圖片來源：[Bitmain](https://www.bitmain.com/)
+### ASIC挖礦
 
-## 用CPU挖能挖多少？
+首先是ASIC挖礦，這類幣種代表礦機廠商已經開發出ASIC，而且官方沒有要對抗(修改演算法或參數)的打算，因此已經都被ASIC攻陷，普通家用電腦或已經沒有競爭的空間。而且ASIC買來也只有挖礦的用途，並無法挪作他用，所以一旦礦機商推陳出新，舊機台也只能直接報廢。
 
-或許你還是很難想像ASIC與家用CPU/GPU的效能差異，[這裡](https://en.bitcoin.it/wiki/Non-specialized_hardware_comparison)頭列了幾個家用硬體的算力值，GPU目前頂多約1000Mh/s、AMD架構的CPU頂多100Mh/s，對比ASIC目前至少有10Th/s起跳的算力([Bitmain](https://www.bitmain.com/)最新的機台甚至可以達到64Th/s)，兩者間的實力整整差了**數萬到數十萬倍**，也就是你用家用電腦挖一整年Bitcoin大概也只能挖....5塊台幣的Bitcoin。
+如果是ASIC的話，你可以到[Asicminervalue](https://www.asicminervalue.com/)查看每種機台的報酬率(像下圖)，沒意外的話報酬率都十分低。即便看起來每月利潤相當豐厚的幣種，也只是因為ASIC還沒大舉進入市面的假象，一旦礦機大舉入市，帳面上的收益會直接崩盤，所以大部分的情況下都應該直接避免購買ASIC，我身邊買ASIC的人通常賺錢的比例....非常低。
 
-註：Mh/s：10^6 hash/s ; Gh/s：10^9 hash/s、Th/s ; 10^12 hash/s
+![ASIC Demo](https://www.lkm543.site/it_iron_man/day19_2.JPG)
 
-## ASIC帶來極度中心化的疑慮
+### GPU挖礦
 
-ASIC除了帶來算力的增長外，同時也壟斷了挖礦的方式，在過去想要參與挖礦與記帳的用戶只需要使用原本的家用電腦便可以參與，但如果現在想要參與挖礦就必須至礦機製造商添購礦機，無形中拉高了一般人參與的門檻，同時也造成了挖礦變成一個極度中心化與專業化的行業，也產生一旦礦機商在挖礦硬體植入後門，整個Bitcoin就會毀於一旦，這些都與原本的去中心化的精神越走越遠，於是乎對抗ASIC的呼聲也越來越大。
+另一種方式是透過家用的顯示卡來挖礦，這種挖礦方式的好處是假使不挖了，GPU還是能夠拿來使用，這類幣種所採用的演算法便是我們昨天提到的Proof by bandwidth或是利用多種演算法交錯來抵禦ASIC，也因為尚未被ASIC大舉進攻，通常個體挖礦也還能夠保持一定的收益，你可以在[Whattomine](https://whattomine.com/)裡查看每一張顯卡或算力的收益，比方說一張[AMD RX570](https://www.amd.com/zh-hant/products/graphics/radeon-rx-570)就可以在[這裡](https://whattomine.com/coins?utf8=%E2%9C%93&adapt_q_380=0&adapt_q_fury=0&adapt_q_470=0&adapt_q_480=0&adapt_q_570=1&adapt_570=true&adapt_q_580=0&adapt_q_vega56=0&adapt_q_vega64=0&adapt_q_vii=0&adapt_q_1050Ti=0&adapt_q_10606=0&adapt_q_1070=0&adapt_q_1070Ti=0&adapt_q_1080=0&adapt_q_1080Ti=0&adapt_q_1660=0&adapt_q_1660Ti=0&adapt_q_2060=0&adapt_q_2070=0&adapt_q_2080=0&adapt_q_2080Ti=0&eth=true&factor%5Beth_hr%5D=27.9&factor%5Beth_p%5D=120.0&zh=true&factor%5Bzh_hr%5D=19.0&factor%5Bzh_p%5D=100.0&cnh=true&factor%5Bcnh_hr%5D=640.0&factor%5Bcnh_p%5D=110.0&cng=true&factor%5Bcng_hr%5D=640.0&factor%5Bcng_p%5D=110.0&cnr=true&factor%5Bcnr_hr%5D=730.0&factor%5Bcnr_p%5D=120.0&cnf=true&factor%5Bcnf_hr%5D=1250.0&factor%5Bcnf_p%5D=110.0&eqa=true&factor%5Beqa_hr%5D=85.0&factor%5Beqa_p%5D=100.0&cc=true&factor%5Bcc_hr%5D=0.0&factor%5Bcc_p%5D=0.0&cr29=true&factor%5Bcr29_hr%5D=0.0&factor%5Bcr29_p%5D=0.0&ct31=true&factor%5Bct31_hr%5D=0.2&factor%5Bct31_p%5D=100.0&eqb=true&factor%5Beqb_hr%5D=13.0&factor%5Beqb_p%5D=110.0&ns=true&factor%5Bns_hr%5D=700.0&factor%5Bns_p%5D=140.0&bcd=true&factor%5Bbcd_hr%5D=8.6&factor%5Bbcd_p%5D=110.0&tt10=true&factor%5Btt10_hr%5D=11.5&factor%5Btt10_p%5D=110.0&x16r=true&factor%5Bx16r_hr%5D=6.5&factor%5Bx16r_p%5D=110.0&phi2=true&factor%5Bphi2_hr%5D=0.0&factor%5Bphi2_p%5D=0.0&xn=true&factor%5Bxn_hr%5D=0.0&factor%5Bxn_p%5D=0.0&hx=true&factor%5Bhx_hr%5D=6.6&factor%5Bhx_p%5D=110.0&zlh=true&factor%5Bzlh_hr%5D=12.5&factor%5Bzlh_p%5D=100.0&ppw=true&factor%5Bppw_hr%5D=6.7&factor%5Bppw_p%5D=130.0&x25x=true&factor%5Bx25x_hr%5D=0.7&factor%5Bx25x_p%5D=75.0&mtp=true&factor%5Bmtp_hr%5D=0.0&factor%5Bmtp_p%5D=0.0&lrev3=true&factor%5Blrev3_hr%5D=33.5&factor%5Blrev3_p%5D=120.0&factor%5Bcost%5D=0.1&sort=Profitability24&volume=0&revenue=24h&factor%5Bexchanges%5D%5B%5D=&factor%5Bexchanges%5D%5B%5D=binance&factor%5Bexchanges%5D%5B%5D=bitfinex&factor%5Bexchanges%5D%5B%5D=bitforex&factor%5Bexchanges%5D%5B%5D=bittrex&factor%5Bexchanges%5D%5B%5D=cryptobridge&factor%5Bexchanges%5D%5B%5D=dove&factor%5Bexchanges%5D%5B%5D=exmo&factor%5Bexchanges%5D%5B%5D=gate&factor%5Bexchanges%5D%5B%5D=graviex&factor%5Bexchanges%5D%5B%5D=hitbtc&factor%5Bexchanges%5D%5B%5D=hotbit&factor%5Bexchanges%5D%5B%5D=ogre&factor%5Bexchanges%5D%5B%5D=poloniex&factor%5Bexchanges%5D%5B%5D=stex&dataset=Main&commit=Calculate)看到它的算力與利潤分別為多少，評估後再決定要不要下去。
 
-![Bitmain Centralization](https://miro.medium.com/max/696/0*DPV6mAmaFBs9shJN.jpg)
-圖片來源：[Mining Centralization Scenarios](https://medium.com/@jimmysong/mining-centralization-scenarios-b74102adbd36)
+![RX 570 Demo](https://www.lkm543.site/it_iron_man/day19_1.JPG)
 
-# Ethereum如何對抗ASIC
 
-挖礦的總出塊利潤是固定的，一有利潤就會有人想研製特別的硬體(ASIC)專門投入挖礦來取得比別人更大的優勢，為了對抗ASIC造成後續中心化與門檻提高的問題，`Ethereum`於是從挖礦的演算法著手，設計出不適合ASIC運算的演算法來抵抗威脅。
+### Nicehash挖礦
 
-## Dagger-Hashimoto演算法
+另一種挖礦方式是持有硬體，但不直接參與特定的礦池挖礦，而是透過[Nicehash](https://www.nicehash.com/)這個算力租賃平台把自身的算力售予別人，Nicehash在接受到你的算力後，會直接結算BTC給你，對於想要直接獲取BTC的人實在方便許多，同時也提供了一種利用GPU來獲取BTC的方式。Nicehash比較特殊的作法是它會檢測你每一張顯示卡對於各個演算法下的效能，接著根據購買者對於每個演算法的出價決定我們的顯示卡究竟要採用哪個演算法。
 
-Ethereum的挖礦演算法叫做`Dagger-Hashimoto`，簡稱為`Ethash`，是把Thaddeus Dryja發明的`Hashimoto演算法`加入Ethereum創始人Vitalik Buterin發明的`Dagger演算法`後融合而成，特色是挖礦的效率基本上和處理器效能無關，而跟記憶體的頻寬成正相關。
+![Nicehash](https://fsmedia.imgix.net/3a/09/0f/04/ec2e/41e1/b991/22ce07a8f5e2/logobiglightpng.png?auto=format%2Ccompress&dpr=2&w=650)
 
-為什麼透過頻寬就可以對抗ASIC呢？因為ASIC的原理是透過處理器電路的設計與數目的堆疊來加大計算固定演算法的速度，因此設計的核心數目越多、製程越高階，處理速度就能夠輾壓家用的CPU與GPU，但同時在這種設計下的記憶體是共用的，也就是說即使計算能力得到了提升，記憶體的速度仍然留在原地。
+圖片來源：[inverse.com](https://www.inverse.com/article/39221-nicehash-robbed-of-78-million-worth-of-bitcoin)
 
-如果設計出一種以頻寬(傳遞資料的速度，不懂的話可以看[這裡](https://www.itsfun.com.tw/記憶體頻寬/wiki-2351866-7387646))決定運算能力的算法，因為每塊記憶體的頻寬跟處理器的控制單元數目都是固定的，因此通常增加**記憶體的數目只能加大記憶體的容量，並沒有辦法加大頻寬**，有點像是一座小島上只有一個港口能靠岸(下圖)，這時候在島上加蓋新房子的確能夠增加容納的人數(記憶體大小)，但運輸的效能(運算能力)取決在港口數目而絲毫沒有改變。要同時移動更多人(增加運算能力)，增加房屋(記憶體數目或容量)是沒有用的，只能增加手上持有的小島(機器)數目，因此ASIC並沒有辦法佔到太多便宜。(但[雙通道、四通道](https://zh.wikipedia.org/zh-tw/%E9%9B%99%E9%80%9A%E9%81%93%E8%A8%98%E6%86%B6%E9%AB%94%E6%8A%80%E8%A1%93)的技術就另當別論，而且雙通道或四通道並不適用在有向無環圖演算法)。
+Nicehash的另一種使用方式就是購買別人的算力，通常是礦池在剛始建立時缺乏算力而無法穩定出塊與吸引其他人加入時會使用到，[這裡](https://justhodl.blogspot.com/2018/03/nicehash-buy-hashrate-mining.html)有詳細的買算力教學，有興趣的話可以閱讀，不過另一種用法就是被攻擊者拿來租借後進行51%攻擊了(之後會再詳述)。
 
-![Port](https://www.lkm543.site/it_iron_man/day18_1.png)
+### Ethereum的算力預估
 
-我們來簡單說明一下Dagger-Hashimoto演算法是如何實做出來的。
+目前主流的個體挖礦都是Ethereum了，因此下面的教學主要都是以ETH為主，這裡提供一個簡單的方式去粗略預估每種顯卡的算力：把顯卡的`記憶體頻寬除以8000Bytes`便是大概的算力值(h/s，每秒可以算幾個hash)。原理就是我們昨天說的─Dagger-Hashimoto演算法是Proof by bandwidth，因此根據顯卡的頻寬就能夠大概把算力估計出來(但只有在軟體已經針對硬體優化過的狀況下適用)。
 
-## 有向無環圖(Directed Acyclic Graph，DAG)
+以RX570為例，你可以在[這裡](https://www.techpowerup.com/gpu-specs/radeon-rx-570.c2939)看到RX570的頻寬大約是224GB/s，除以8000 Bytes後便大約是28 Mh/s，跟實際上超頻後的最大值31Mh/s相距不遠。
 
-在講解Dagger-Hashimoto演算法之前，來談一下有向無環圖(Directed Acyclic Graph，DAG)，一個典型的有向無環圖的定義如下：
+![570 Spec](https://www.lkm543.site/it_iron_man/day19_3.JPG)
 
-> 1. 該圖形的每條邊都有方向性(有向)
-> 2. 從圖中的任意點出發，無論路徑為何都無法回到起點(無環)
+至於另一張家用神卡[1050ti](https://www.geforce.com/hardware/desktop-gpus/geforce-gtx-1050-ti/specifications)的記憶體頻寬約在112GB/s上下，換算出的算力大約14Mh/s。
 
-![DAG](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Topological_Ordering.svg/1024px-Topological_Ordering.svg.png)
-圖片來源：[維基百科](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
+## 選擇硬體
 
-Ethash的原理就是應用有向無環圖(DAG)，它的設計是每30000個Epoch(~5.2天)就會生成一個稍大一點的DAG，因此每過一個Epoch後為了產生新的DAG都會稍稍延遲，但因為Ethash的DAG只跟目前的區塊高度(數目)有關，為了避免等待，許多挖礦程式也會同時生成兩個DAG以免Epoch更新時的延遲。
+選擇好欲挖掘的幣種與演算法後，接著就可以來選擇要添購的硬體，這裡我們以Ethereum為例，組成礦機的過程大致上跟組裝一台電腦一樣，但在同一台主機上我們可能會插上十幾張顯卡！
 
-## Hashimoto演算法
+### CPU、RAM、SSD、網路
 
-Thaddeus Dryja提出的Hashimoto演算法期望透過I/O(輸入跟輸出)的頻寬來決定挖礦的能力以抵制ASIC，它的哈希算法步驟如下(這裡的⊕就是[XOR運算](https://zh.wikipedia.org/zh-tw/%E9%80%BB%E8%BE%91%E5%BC%82%E6%88%96)、<<與>>分別是[位元左移與右移](http://tw.gitbook.net/t/python3/article-79.html))：
+為了讓礦機能夠順利運行，因此一般電腦的零組件是不可少的，但又為了節省成本，因此在CPU、RAM、SSD、網路選擇最基本/廉價的硬體即可，也就是通常只會搭配4GB的RAM與128GB的SSD(建議不要用HDD，不然等待重開機的過程會讓你想死)，CPU大部分人都選用便宜堪用的[G3930](https://ark.intel.com/content/www/tw/zh/ark/products/97452/intel-celeron-processor-g3930-2m-cache-2-90-ghz.html)，只要1000出頭便可以入手。網路的部分也是一樣，因為現今的挖礦幾乎都採用了我們前幾天提到的Stratum協定，因此一台礦機只需要幾KB的上下載速度便足夠了！
 
-1. 輸入前一個區塊的hash(`previous_hash`)、交易明細組成的Merkle Tree的根`merkle_root`、欲挖掘的`nonce`透過`SHA-256`生成一個初始的`hash_initialize`(這一步就是Bitcoin產生hash的過程)。
-2. 讓i從從0到63，依序把
-    1. `hash_initialize`右移i個位元
-    2. 位移後除以交易個數後取餘數就可以得到要取出交易(`transaction`)
-    3. 取出該筆的交易(`transaction`)的交易序號(`tx_id`)後再左移i個位元
-3. 讓取得到的64組位元彼此依序做XOR運算得到最後的交易序號(`tx_id_final`)
-4. 讓`nonce`左移192個位元
-5. 再讓最後的交易序號(`tx_id_final`)與左移後的`nonce`做XOR運算
-6. 得到最後的`final_hash`
-7. 確認`final_hash`是否合乎規定，不合的話就改變`nonce`後重新計算一次。
+### 主機板
 
-```python
-hash_initialize = sha256(previous_hash, merkle_root, nonce)
-for i in range(0,64):
-    shifted_hash = hash_initialize >> i
-    transaction = shifted_hash % len(transactions)
-    tx_id[i] = get_tx_id(transaction) << i
-tx_id_final = tx_id[0] ⊕ tx_id[1] … ⊕ tx_id[63]
-final_hash = tx_id_final ⊕ (nonce << 192)
-```
+主機板的使用就一個要點：能夠接上GPU的PCIE插槽越多越好，因為主機零件(CPU、RAM、SSD)是有成本的，如果能夠在一台主機上插上越多的GPU，就代表每張GPU需要攤提的主機成本就越低也越有競爭力，主流八卡機是採用[B250H Gaming](https://www.asus.com/tw/Motherboards/ROG-STRIX-B250H-GAMING/)這張主機板，但其實上面只有六個PCIE插槽，其餘兩個需要從M.2轉接。專業或想要挑戰的人可以選用[ASUS Mining Expert](https://www.asus.com/us/Motherboards/B250-MINING-EXPERT/)，上頭甚至有19個PCIE插槽！雖然說插槽數一多成本也下降，但隨之而來除錯上的困難也是必須考慮的。
 
-可以發現這個過程不停在讀取區塊鏈上的歷史交易紀錄，也同時在做記憶體的左移與右移，因此記憶體的頻寬決定了Hashimoto演算法的運算速度。
+### PSU(電源供應器)
 
-## Dagger-Hashimoto
+PSU(電源供應器)的使用只有兩個要點：務必足瓦、請使用金牌以上認證的PSU。足瓦是為了保證供電是有餘裕的避免突波造成電器的損壞，如果瓦數不足有時候會透過雙電源啟動線(下圖)來提供足夠的供電(畢竟如果你真的用了19張顯示卡在Mining Expert那張板子上，光靠一台電源供應器一定是推不動的。)，金牌以上的電源供應器是為了保證電源使用的效率，畢竟電費是開始挖礦後最大的開支，因此電源的轉換效率會直接決定日後的電費多寡。
 
-`Dagger-Hashimoto`加入Vitalik Buterin發明的`Dagger演算法`，相較於`Hashimoto`，`Dagger-Hashimoto`用一個有向無環圖(DAG)替代掉交易紀錄，也就是讓對歷史交易紀錄的讀寫變成對DAG的讀寫。
+補充說明一下：80PLUS的認證依序可以分成：銅牌、銀牌、金牌、白金、鈦金，通常越往上電源轉換效率越好、越省電，但價格也會越高。
 
-對`Dagger演算法`有興趣進一步了幾的話可以參考[這裡](http://www.hashcash.org/papers/dagger.html)。
+![雙電源啟動線](http://www.armygroup.com.tw/shop/images/201002/goods_img/3598_G_1265084554965.jpg)
+圖片來源：[改裝軍團](https://www.armygroup.com.tw/shop/goods-3598.html)
 
-簡單說明一下`Dagger-Hashimoto`中產生DAG的步驟：
+### GPU
 
-1. 計算出16MB大小的`cache`
-2. 透過這16MB的`cache`生成1GB大小的`DAG`
-3. 每隔30000個Epoch，因為硬體的進步就會讓`cache`跟`DAG`也長大一些
+在確保你的GPU有辦法提供你想要的算力與性價比後(通常是RX570、RX580、GTX 1060、GTX1070)，GPU的選用主要有兩點：保固期與記憶體廠牌，保固期決定了你的顯示卡能夠被使用多久，即便損壞你還是能夠跟原廠換一張新的過來，而記憶體的製造商主要有三大廠，一般而言：`三星>美光>海力士`。因為對於Ethereum的算法而言，記憶體的頻寬是重要的，而在實測上三星與美光能夠超頻並提供高一點的算力(其中三星又>美光)，而海力士則幾乎不能超頻。
 
-如下圖所示，因為DAG是有方向性而且連續的，其資料的讀寫無法被平行化處理，所以雙通道、四通道的技術很難應用在Dagger-Hashimoto算法之上。比方說你的確可以把整個DAG切割成四個記憶體(RAM)儲存，但檢索時還是得從第一個RAM逐步檢索到最後一個RAM，因此多通道的技術並不能直接適用於DAG(當然你可以透過演算法嘗試解決，比如說紀錄該DAG於每塊記憶體的輸入與輸出藉此加速計算)。
+## 選擇作業系統
 
-![RAM](https://www.lkm543.site/it_iron_man/day18_2.png)
+作業系統的選用除了常見的Windows與Linux外，目前也有許多開發出專門應用在挖礦上的作業系統，像是[Hiveos](https://hiveos.farm/)、[ETHOS](http://ethosdistro.com/)、SparkOS等作業系統，如果是專門挖礦、平常不會拿來使用的主機強烈建議安裝挖礦專用的作業系統，裏頭整合了驅動程式與挖礦控制等軟體，可以避免安裝驅動程式不合或是難以監控的問題。另外一點是隨著時間過去，DAG也會增加，AMD預設的顯示卡架構會印為DAG的增加造成大幅度的算力下降，選擇挖礦的作業系統能夠幫助你輕鬆解決這個問題而不需要另外設定。(一般Windows你安裝AMD的驅動後必須在驅動程式介面啟動運算模式以避免DAG增大帶來的負面影響)。
 
-# 其他種抗ASIC演算法
+## 選擇挖礦軟體
 
-## XMR與ASIC開發商的戰爭
+Ethereum主要的挖礦軟體有Claymore、Ethminer、Phoenix Miner等，其中臺灣最多人使用的就是Claymore，即使它會抽取你1%不等的算力(你可以指定不要讓Claymore抽1%，但Claymore會讓你算力減少2%)，但因為Claymore目前仍是主要公認效能最好的挖礦軟體(沒有之一)，因此還是最主流的挖礦軟體。你可以到[bitcoin talk](https://bitcointalk.org/index.php?topic=1433925.0)下載最新的Claymore來使用。
 
-XMR(門羅幣)最初採用的是CryptoNight演算法，該演算法的特色是需要一個2mb的cache(快取記憶體)支撐，也因為CPU的cache相較於GPU還是有優勢的，因此在CryptoNight的算法上GPU雖然還是相對有一些優勢，但兩者的差異不大。但CryptoNight終究還是被礦機製造商攻破，開發出了算力高達220Kh/s的[礦機](https://www.aliexpress.com/item/32951312898.html)，即便是與算力最高的顯示卡VEGA系列(大概擁有2Kh/s的算力)比較，也整整高出了超過一百倍(更何況大部分顯卡都只有400-700h/s)！
+# 實際畫面
 
-為了應對這種狀況跟未來持續可能發生的威脅，XMR決定每年會固定時間更改參數，徹底杜絕ASIC(還記得ASIC只能運算同算法同參數嗎？)。
+這裡我用家裡的電腦(Win10)搭配[RX460](https://www.techpowerup.com/gpu-specs/radeon-rx-460.c2849)做示範，RX 460擁有112GB/s的頻寬，理論上能夠跑到約14Mh/s，但因為這裡我沒有超頻與優化，而只有看到11~12Mh/s的算力。也可以在畫面中看到DAG的載入，這就是我們昨天所說的Dagger-Hashimoto演算法裏頭的DAG！
 
-下面可以看到XMR改變算法與參數後，一堆ASIC被洗出去造成全網算力驟降的情形：
-
-![XMR](https://i.redd.it/jlsz93gdjnq01.png)
-圖片來源：[Reddit](https://www.reddit.com/r/Monero/comments/8aoxhp/bye_bye_asics/)
-
-## X11、X13、X15、X17...
-
-另一種對抗ASIC的路線就是混合各種不同的演算法，因為ASIC只能針對特定演算法做優化，於是根據現在的時間、區塊高度、交易紀錄等參數隨機決定要用哪一種算法，藉此來抵制無法隨意切換算法的ASIC。順帶一提，這裡的11、13、15、17分別代表了其中混合了幾種不同的挖礦演算法。
-
-# 究竟有沒有必要對抗ASIC？
-
-我覺得[這篇整理的觀點非常好](https://tokeneconomy.co/is-the-war-against-asics-worth-fighting-b12c6a714bed)，究竟有沒有對抗ASIC的必要一直是熱門的討論議題，兩派的論點大致如下：
-
-- 支持對抗ASIC：
-    1. ASIC的出現讓一般人參與的門檻拉高
-    2. ASIC讓礦機製造商把持多數算力，違背去中心化的精神
-- 反對對抗ASIC：
-    1. 固定更改演算法會有非常大的風險
-    2. 修改算法後都會造成一陣子算力的流失與低落(因為ASIC剔除後算力下降，但出塊難度尚未來的及調整過來，礦工無利可圖)，此時缺乏算力的情形下非常容易被攻擊。
-    3. GPU的礦場也有中心化的問題。
-    4. 剔除了ASIC只會讓製造商改用FPGA應對，但純對抗沒有辦法徹底解決問題。
-    5. ASIC的出現是因為人性的貪婪，是必然而非偶然無法避免。
-
-不管ASIC的出現是好是壞，礦工間的戰爭，還在持續著。
+![Miner Demo](https://www.lkm543.site/it_iron_man/day19_4.JPG)
 
 # Ref:
-
-- [Wikipedia-Directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
-- [Wikipedia-Dagger-Hashimoto](https://en.bitcoinwiki.org/wiki/Dagger-Hashimoto)
-- [Wikipedia-Ethash](https://en.wikipedia.org/wiki/Ethash)
-- [每天五分鐘，玩轉區塊鏈(14)：以太坊簡介](https://kknews.cc/zh-tw/tech/e3rm89q.html)
-- [電腦記憶體雙通道、四通道記憶體對遊戲重要嗎？](https://ek21.com/news/2/104794/)
-- [What actually is a DAG?](https://ethereum.stackexchange.com/questions/1993/what-actually-is-a-dag)
-- [Hashimoto: I/O bound proof of work](https://diyhpl.us/~bryan/papers2/bitcoin/meh/hashimoto.pdf)
-- [Dagger: A Memory-Hard to Compute, Memory-Easy to Verify Scrypt Alternative](http://www.hashcash.org/papers/dagger.html)
-- [以太坊原始碼分析—Ethash共識演算法](https://www.jishuwen.com/d/24xM/zh-tw)
-- [Is The War Against ASICs Worth Fighting?](https://tokeneconomy.co/is-the-war-against-asics-worth-fighting-b12c6a714bed)
+- [Asicminervalue](https://www.asicminervalue.com/)
+- [Whattomine](https://whattomine.com/)
+- [bitcointalk](https://bitcointalk.org/)
+- [維基百科-80PLUS](https://zh.wikipedia.org/wiki/80_PLUS)
