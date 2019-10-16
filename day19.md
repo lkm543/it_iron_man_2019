@@ -1,125 +1,179 @@
-# 傳統的網路架構
+# 礦工間的戰爭
 
-![Client–server model](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Client-server-model.svg/1920px-Client-server-model.svg.png)
+挖礦是有利潤的，但也因為區塊鏈的出塊與獎勵是固定的，挖礦對於所有參與的礦工是一場[零和遊戲](https://zh.wikipedia.org/wiki/%E9%9B%B6%E5%92%8C%E5%8D%9A%E5%BC%88)。為了增加自己的收益，方法大致可以分為提高獲利、壓低成本兩種方式，下面就幾種常見增加收益的方法做個簡單說明(~~屏除違法的偷接電~~)。
 
-圖片來源：[Wikipedia](https://en.wikipedia.org/wiki/Client%E2%80%93server_model)
+## 壓低成本(電費)
 
-傳統的網路架構是每一張圖片、影片、網站、APP都會有存放的伺服器(`server`)，每個伺服器會有自己像門牌一般的ip位址，當我們(`client`)瀏覽網頁時，其實就是透過ip位址向伺服器發出請求(request)，再由伺服器回傳我們瀏覽網頁上的資源(圖片、影片、html等)給我們。可以說伺服器本身掌控了話語權，也決定了我們能看到甚麼。
+電費的成本可以佔到總成本的30-60%不等(視硬體價格而定，目前因為幣價相對低點，因此硬體價格與折舊費用低廉，電費可以佔到總成本的60%左右)，並且因為挖礦所需的消費型3C硬體的價格往下談的空間不大，壓低成本的方式最常從電費下手。
 
-因此傳統的架構又稱為`Client–Server model`。
+### 硬體調校
 
-以facebook為例，你在facebook的所有帳戶、照片、好友資料通通都存在facebook的伺服器中，facebook也有權力決定要給你看到/看不到甚麼，所以與其說是你的帳戶，不如說是facebook擁有你自願上傳的資訊，當你有需求時再順道回傳給你一份罷了。
+透過軟體與參數的調校可以稍微減少供耗，以Ethereum的Dagger-Hashimoto演算法為例，它需要記憶體的頻寬，但對於核心的計算能力反而不太要求，但核心往往是整張GPU中最耗電的部分，因此我們可以透過降低核心電壓頻率、拉高記憶體頻率的方式來達到提高算力的同時也減少供耗的效果。
 
-![Centralized](https://www.dcsorg.com/images/centralized-management.jpg)
+### 契約用電與時間電價
 
-圖片來源：[Digital Currency Systems](https://www.dcsorg.com/centralized-management.php/)
+除了調校GPU的參數外，也可以向[台電](http://taipowerdsm.taipower.com.tw/)申請時間電價(補充個小知識：台灣並沒有工業用電這種東西，只有契約用電！)或契約用電，透過在離峰時間才啟動挖礦程式可以讓每度電的電費壓在1.8元以下。而契約用電的成本則落在2.5-2.8元左右/度，比起家用最高級距動輒5、6元便宜許多。但申請前要注意台電的時間電價與契約電都有綁約一年的限制，而且契約電每月需要根據簽訂的容量繳交相對應的基本費(即便你一度電都沒用也得繳)，所以契約電對於專業礦場較為適合、家用時間電價對於散戶較為友善。
 
-所以傳統的中心化架構就是所有使用者的請求都會被送到同一個伺服器處理。另一個中心化的例子就是銀行的金流系統，當我們要匯款時便是向銀行的伺服器發出請求，請伺服器驗證我們的身分並且針對我們的請求加以處理，同時我們也信任伺服器的處理結果，整個流程都由銀行端完成。
+![時間電價](http://taipowerdsm.taipower.com.tw/images/form_01.png)
+圖片來源：[台電](http://taipowerdsm.taipower.com.tw/)
 
-這種架構的優點就是處理迅速，我們只需要等待單一伺服器的回應就可以知道結果。但其中卻有兩大缺陷：
+## 增加挖礦期望值
 
-## Scalability
+如果對區塊鏈或礦池的運作夠熟悉，也可以透過區塊廣播或打包的眉眉角角來獲取更大的利益。這裡要另外說明，因為挖礦對所有礦工而言是一個零和遊戲，在增加自己獲利的同時也會損害到其他人的利益，因此某些為了使自己的利益最大化的方式往往被認為是不道德的。
 
-Scalability代表的是可擴充性，也就是當使用者的數目成長時，系統接收並處理請求的伺服器數目卻是固定的，固定的伺服器規格代表能處理的使用者數目或是單位時間內的請求數是會有上限的，如果想要拉高上限，代表的是營運成本也會跟著上升(但其實近年因為硬體的進步與分散式系統的發達已經很大解決Scalability的問題了)。
+### 挖空塊
 
-## Reliability
+其中一個礦池的作弊方式便是`挖空塊`，還記得我們在之前寫的簡易區塊鏈中是這樣處理接收到的區塊的：
 
-Reliability代表的是系統的可靠度，也就是系統的妥善率有多少。傳統的`Client–Server model`仰賴單一伺服器與節點的運行，所以一旦伺服器出錯或是維修，整個服務就會終止，也因如此我們偶爾還是會聽到facebbok斷線或是銀行服務會有固定的停止服務時間等等。
+```python
+def receive_broadcast_block(self, block_data):
+    last_block = self.chain[-1]
+    # Check the hash of received block
+    if block_data.previous_hash != last_block.hash:
+        print("[**] Received block error: Previous hash not matched!")
+        return False
+    elif block_data.difficulty != self.difficulty:
+        print("[**] Received block error: Difficulty not matched!")
+        return False
+    elif block_data.hash != self.get_hash(block_data, block_data.nonce):
+        print(block_data.hash)
+        print("[**] Received block error: Hash calculation not matched!")
+        return False
+    else:
+        if block_data.hash[0: self.difficulty] == '0' * self.difficulty:
+            for transaction in block_data.transactions:
+                self.pending_transaction.remove(transaction)
+            self.receive_verified_block = True
+            self.chain.append(block_data)
+            return True
+        else:
+            print(f"[**] Received block error: Hash not matched by diff!")
+            return False
+```
 
-# Peer to Peer(P2P)網路
+大抵而言可以把步驟簡化成：
 
-傳統的網站架構是把所有的資源都放置在同一台伺服器上，有需要的用戶再向伺服器檢索。Peer to Peer(P2P)網路則是網路上的所有人都負責儲存了全部或部分的所有資料，除了向其他IP位址發起請求外，本身也需要負責處理收到的請求，**自身既是Client也是Server**。
+1. 確認該區塊的哈希數是否符合當下難度的規範
+2. 如果符合就把該區塊內的交易(`pending_transaction`)自等待中的交易內移除
+3. 結束目前的挖礦
+4. 把新的交易放置入新的區塊中
+5. 開始挖掘新區塊
 
-但其實P2P網路並非是非常新的概念，在常聽到的[TCP/IP通訊協定](https://zh.wikipedia.org/zh-tw/TCP/IP%E5%8D%8F%E8%AE%AE%E6%97%8F)中其實就是一種終端到終端(end to end)的概念，通訊的兩端是彼此平等不分client與server的！只是因為實務上我們上網幾乎都是在檢索其他網站的資料，為了效率與實務上應用的考量網站經營者才會把所有資源集中存放與處理。
+但在步驟進行過程中，礦池的算力是停擺的，但是礦機卻仍然在持續運行著。因此有些礦池會為了節省時間與能源，在尚未接收到整個區塊的廣播時就直接開始挖掘下一塊，但也因為如此礦池根本不知道這區塊內有哪些交易，也因此無法確認哪些等待中的交易(`pending_transaction`)是已經被打包進去/交易過的，所以在下一區塊的挖掘中礦池無法加入任何交易紀錄，所以即便礦池真的挖掘出新區塊，裏頭也沒有任何交易，俗稱空區塊，他們接收到廣播的區塊後的方式如下。
 
-![P2P](https://www.skalex.io/wp-content/uploads/2017/06/p2p-web-model-transparent.png)
+1. 確認該區塊的哈希數是否符合當下難度的規範
+2. 不置入任何交易就開始挖掘新區塊
 
-圖片來源：[https://www.skalex.io](https://www.skalex.io/blockchain-p2p-web/)
+因為少了確認交易內容、打包新交易的過程，所以挖空塊能夠比正常挖礦者更快進入nonce值的計算階段，但此時的區塊卻沒有辦法驗證任何人的交易。所以有些人會覺得礦池為了自身利益不打包其他人的交易實在是母湯的行為。更多挖空塊的細節可以參考[這裡](https://zhuanlan.zhihu.com/p/46372884)。
 
-P2P網路在Scalability與Reliability都具有很大的優勢，因為每個獨立的終端都可以視作Server，當終端數目增加，Server數目也隨之增加，所有可運用的硬體資源與網路頻寬也隨之增加，在Scalability會具有很大的優勢。而Reliability的部分因為每個終端都可以獨立運作，所以不存在傳統中心化架構中一旦單一伺服器停擺就會造成整個服務中斷的問題。
+### 跳跳池
 
-除了Scalability與Reliability外，P2P網路也因為沒有中心化的伺服器，而讓資料沒有被中心化機構掌控或修改的可能，也確保了資訊的安全。
+在講跳跳池前就必須先談礦池的運作與分潤方式：可以把礦池想像成接受到難題後，就把該難題拆解成許多小難題分派給參與的礦工，每當礦工解決完一個小難題後便回傳給礦池，此時稱為一個`share`，主流幾種礦池在出塊後與礦工們的分潤方式：
 
-## P2P網路的難題
+#### RBPPS(Round Base Pay Per Share)
 
-雖然P2P網路可以有效解決傳統中心化網路在Scalability與Reliability的問題，但在技術上因為需要參照與協調許多終端所以技術的複雜度會比傳統Client–Server model複雜。以下簡述幾種P2P網路實作上的難題。
+RBPPS是當礦池挖掘到新區塊後，就立刻把新區塊的收益根據這段時間的大家的`share`數目來分派收益，因此礦工本身也承擔了風險，如果多出塊，礦工就多賺；沒出塊，礦工就會虧錢。
 
-### 工作的分配
+#### PPS(Pay Per Share)
 
-雖然P2P網路的硬體資源與頻寬會隨著終端數目的增加而增加，但如何配置與分享彼此間閒置的資源是一大難題，畢竟即便資源增加，若沒有好好地被分配與利用也是徒然。以下簡述幾種工作分配的方式：
+PPS的方式是不論礦池出塊與否，礦池都會根據礦工所解決的`share`數目給礦工應當的收益，因此出塊與否的風險是由礦池承擔的，如果礦池運氣好多出幾塊礦池就會大賺，但如果運氣不好就會大虧了。
 
-#### Opportunistic Load Balancing(OLB)
+#### PPLNS(Pay Per Last N Share)
 
-Opportunistic Load Balancing是將目前的工作隨意分配給一台閒置的電腦，目標是讓所有的電腦都處於工作的狀態，但因為沒有考量每個工作的工作量與每台電腦獨立且不同的運算能力，所以不適用於由異質終端所構成的P2P網路。
+PPLNS是只根據礦池出塊後過去的N個`share`數目給礦工應當的收益，至於為什麼會這樣設計是為了避免跳跳池的礦工(以下說明))。
 
-#### Minimum Execution Time(MET)
+#### 跳跳池
 
-Minimum Execution Time是不考慮電腦目前的工作狀態，直接把這項工作分配給執行時間最短的電腦，但缺點是會造成負載的不平衡，運算能力最強的電腦會被分派到最多工作，運算能力最弱的就會一直閒置，所以同樣不適用於由異質終端所構成的P2P網路。
+了解跳跳池的原理前先來了解一個值：`幸運值`。根據礦池持有的算力佔全網算力的比例可以算出預期的出塊時間，比方說Ethereum大約每15秒會出一塊，如果礦池持有總算力的1%，則平均下來大概每25分鐘可以出一塊，計算方式如下：
 
-#### Minimum Completion Time(MET)
+> 出塊時間15秒/持有算力1% = 預期出塊時間1500秒 = 25分鐘
 
-Minimum Completion Time是根據電腦的最小完成時間(目前的工作要多久才會結束)來分派工作，越快結束的電腦就會被優先指派然後計算，所以並不保證執行時間(Execution Time)會最短。
+幸運值的意思是現在的挖掘時間是預期出塊時間的多少百分比，也就是說長時間平均下來，大約幸運值累積到100%就能夠出一塊，如果幸運值小於100%時就挖到區塊，代表礦池的運氣很好，礦工們的收益會高於預估；但如果幸運值大於100%才出塊，代表礦池的運氣不好，得花費比期望值高的算力才能夠出塊。
 
-#### Min-Min
+> 幸運值 = 已挖掘區塊時間/預期出塊時間 * 100%
 
-Min-Min是根據工作在每一台電腦預估可以完成的時間，所以也會將電腦目前的工作狀態列入考量。完成時間的意思便是等待時間加上執行時間(上面的Execution Time)，所以雖然能確保工作能在最短時間內被完成，但預估完成時間也是難事。
+在[臺灣乙太幣礦池](http://tweth.tw/)中的幸運值就在預期出塊那裏(下圖)，也可以透過使用者介面發現臺灣乙太幣礦池是修改我們幾天前介紹的[Open source礦池程式碼](https://github.com/sammy007/open-ethereum-pool)而來。
 
-### 節點的搜尋
+![Lucky](https://www.lkm543.site/it_iron_man/day20_1.JPG)
 
-既然P2P網路是由許多獨立的Peer所構成，那要怎麼知道參與網路的節點確切的ip位址呢？你只能透過一些中心化的網站或是上網搜尋其他人提供的節點位置，比方說[這個網站](https://bitnodes.earn.com/)就記錄了Bitcoin網路線上的所有節點(下圖)，找到節點們的資訊後你才能參與整個P2P網路的運作。
+而跳跳池的做法就是：當幸運值小於100%時進入RBPPS的礦池，等到幸運值大於100%的時候就轉出到其他礦池以獲取更大的收益。乍聽之下好像很不合理，畢竟挖礦的時間不是都一樣嗎？為什麼跳來跳去能夠取得較大的收益？
 
-![Peer Location](https://www.lkm543.site/it_iron_man/day21_1.JPG)
+要理解這個原因可以從期望值的問題下手：**每留在礦池中的固定一段時間能夠獲得多少收益？**
 
-圖片擷取自：[bitnodes](https://bitnodes.earn.com/)
+因為每段時間的出塊機率是固定的，當礦池的幸運值為X%時，如果挖出區塊，便需要跟前面X%所累積出來的`share`數目均分出塊收益，因此留在礦池繼續挖一段時間的收益期望值便是`PPS收益/X`。
 
-### 取得Peer間的共識
+由此可見，當X小於100%時，留在RBPPS的礦池的收益會大於PPS池，但當X大於100%時，留在RBPPS的礦池的收益就會小於PPS池，所以當幸運值小於100%時進入RBPPS礦池、當幸運值大於100%時退出RBPPS礦池便能夠獲取更高的收益。為了避免這種情形才會衍伸出第三種PPLNS的礦池分潤：只根據前面N個share進行分潤，若礦工中途退出，則之前的收益全數歸零。
 
-另一個P2P網路的難題是要取得終端/節點間的共識，P2P網路間必須共享同一份資料與彼此間的資訊才能夠協作，且因為TCP/IP的網路是兩兩連接而成的，由簡單的排列組合可以得知當節點有N個時，所有節點可以組成的連線個數便是CN取2，就是N\*(N-1)，大約取決於N^2，這在節點數一多的狀況下要取得Peer間的共識會非常困難，更何況有時候會有惡意的節點加入並且散步造假過的資訊，我們明日會在根據拜占庭將軍問題詳談如何解決這個問題。
+這裡我們可以做一個小實驗，假設有兩人持有同樣算力，其中一人老實地挖完全程，另一人只挖到幸運值100%後就轉去PPS池(這裡我們都以1%為單位，每經過1%幸運值就會有1%機率挖到)：
 
-![https://chart.googleapis.com/chart?cht=tx&chl=C%5EN_2%3DN!%2F(k*(N-2)!)%3DN*(N-1)](https://chart.googleapis.com/chart?cht=tx&chl=C%5EN_2%3DN!%2F(k*(N-2)!)%3DN*(N-1))
+1. 對於始終留在同一個RBPPS、而且沒有礦工提前跳走的的礦池而言，礦工的收益跟預期差不多。
 
-### 無法徹底去中心化
+    ```python
+    pool_reward = 0
+    try_times = 10000
+    mine_time = 0
 
-最後一個問題是P2P網路雖然可以稍微擺脫被單一中心化機構掌控資源的風險，但實際上P2P網路沒有辦法達到完全的去中心化，原因是網路提供商ISP或是[DNS](https://zh.wikipedia.org/zh-tw/%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F)還是掌控在中心化機構手中，像是上面節點的搜尋也需要仰賴別人提供的資訊，因此充其也只是最後資訊的儲存與處理是去中心化，底層的通訊還是得仰賴特殊的機構完成。
+    # RBPPS Miner
+    for i in range(try_times):
+        luck = 1
+        while(True):
+            if random.randint(0,100) == 0:
+                # Mine Block!
+                pool_reward += 100
+                mine_time += luck
+                break
+            luck += 1
+    print(f"Expect RBPPS miner: {pool_reward/mine_time}")
+    ```
 
-### 資料的重複儲存與不穩定性
+    > Expect RBPPS miner: 0.9913583294422519
 
-因為P2P網路的節點是可以自由加入與退出的，也就是每個節點的穩定性並無法確認，也無法得知每個節點可存續的時間，為了求取資料的安全便需要在複數個位置上儲存同樣的資料，相較於中心化網路會多耗費許多空間，即便如此在儲存使用者分享的檔案時也無法確保該檔案能存在多久。
+2. 但如果有礦工每到幸運值100%便跳去另外一個PPS池，即便在原本RBPPS池的收益會減少成`200*(100/(100+luck))`但同時也會增加PPS的收益`luck - 100`，另外因為礦工在幸運值100%後便離開，在幸運值100%之後的出塊機率也會變成1/2，因此要多篩一次`random.randint(0,1) == 0`：
 
-## P2P網路的分類
+    ```python
+    miner_reward = 0
+    pool_reward = 0
+    mine_time = 0
+    # RBPPS + PPS Miner and Pool
+    for i in range(try_times):
+        luck = 1
+        while(True):
+            if random.randint(0,100) == 0:
+                # Mine Block!
+                if luck < 100:
+                    miner_reward += 100
+                    pool_reward += 100
+                    mine_time += luck
+                    break
+                else:
+                    if random.randint(0,1) == 0:
+                        miner_reward += 200*(100/(100+luck))
+                        pool_reward += 200*(luck/(100+luck))
+                        miner_reward += luck - 100
+                        mine_time += luck
+                        break
+            luck += 1
+    print(f"Expect RBPPS + PPS miner: {miner_reward/mine_time}")
+    print(f"Expect RBPPS + PPS pool: {pool_reward/mine_time}")
+    ```
 
-根據P2P網路處理資訊與分配工作的方式大致又可以分成三種：
+> Expect RBPPS + PPS miner: 1.1591529571485477
+> Expect RBPPS + PPS pool: 0.8354135084376128
 
-![P2P Category](https://www.researchgate.net/profile/Taoufik_Yeferny/publication/332539196/figure/fig2/AS:749686013034497@1555750482262/P2P-architectures-at-a-glance-a-Centralized-architecture-b-Pure-P2P-architecture.png)
+可以發現採用跳跳池的礦工可以高出近20%的收益，而留在原池的礦工則會減少近20%的收益，兩者一來一往就差了將近40%！
 
-圖片來源：[P2P architectures at a glance.](https://www.researchgate.net/figure/P2P-architectures-at-a-glance-a-Centralized-architecture-b-Pure-P2P-architecture_fig2_332539196)
+## 扣塊攻擊
 
-### 中央式P2P
+另一種礦池間的攻擊手法就是利用PPS的漏洞：動用手下的算力去幫別人礦池挖礦，但只發送沒挖掘成功的share，一但確認自己挖到正確的share之後卻不廣播給礦池，所以送出的share都是無效的！但因為PPS分潤制的關係，導致礦池仍然要配發無效share的收益給該名礦工，長期下來礦池配發的收益會與挖掘到的收益不合比例，而導致PPS制礦池的倒閉。
 
-也就是上圖的(a)，代表整個P2P有一個中心伺服器專責處理工作的分派與分流，也會記錄節點們的清單與位置，但中心節點並不實際處理資訊或是資料的儲存，只負責節點間的溝通與工作的調度。
+既然有這麼明顯的漏洞，為什麼還是有礦池使用PPS制呢？因為當礦池規模小時，為了吸引礦工們前來礦池只能使用PPS制(出塊機率太低、預期出塊時間太長，礦工沒有耐心等待)來固定配發收益給前來的礦工們。
 
-### 純P2P
-
-純P2P代表整個P2P網路中的節點都是平等的，彼此並沒有工作或是權力上的分別，也就是上圖的(b)。
-
-### 混合 p2p
-
-混合式P2P很像是中央式P2P，但其跟中央式P2P網路不同的地方是它擁有複數個中心伺服器負責資訊的轉發與協調，[EOS](https://eos.io/)本身就擁有了21個超級節點。
-
-# P2P與區塊鏈
-
-整個Bitcoin全節點可以看作是一種純P2P網路，節點間並沒有先來後到之分，但為了保持資料的一致性(所有節點手上的帳本必須同步)，所以在傳遞或廣播上必須考量到效率與攻擊者假造節點的狀況，因此我們明天就要來介紹究竟在P2P網路中要如何確保節點間的同步與讓正確的共識被形成呢？
-
-到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上。
+到目前為止的文章都會放置在[Github](https://github.com/lkm543/it_iron_man_2019)上，至於今天模擬跳跳池收益的程式碼則放在[這裡](https://github.com/lkm543/it_iron_man_2019/blob/master/code/day19.py)。
 
 # Ref:
-- [Peer-to-Peer (P2P) System](https://sls.weco.net/node/12916)
-- [P2P-顛覆網際網路傳統觀念](http://bm.nsysu.edu.tw/tutorial/htt/dkl/SearchEngine-nsysu041230.pdf)
-- [Wikipedia-Client–server model](https://en.wikipedia.org/wiki/Client%E2%80%93server_model)
-- [P2P的網路共享世界](https://dannylin3000.pixnet.net/blog/post/31271397-p2p%E7%9A%84%E7%B6%B2%E8%B7%AF%E5%85%B1%E4%BA%AB%E4%B8%96%E7%95%8C)
-- [P2P對等網路技術原理整合](https://www.itread01.com/content/1546608974.html)
-- [P2P原理以及如何实现（整理）](https://blog.csdn.net/qq_33850438/article/details/79700133)
-- [以兩階段排程演算法提昇動態階層式點對點網路拓樸之負載平衡](http://ir.lib.cyut.edu.tw:8080/bitstream/310901800/6479/1/Two+phases+scheduling+in+P2P.pdf)
-- [詳解區塊鏈P2P網路](https://www.itread01.com/content/1545529340.html)
-- [Towards Efficient Simulation of Large Scale P2P Networks](https://slideplayer.com/slide/4806764/)
-- [點對點網際網路技術(P2P)和軟體之概論](https://www.shs.edu.tw/works/essay/2008/10/2008103101062756.pdf)
+- [打压对手，让其他矿池倒闭，神鱼所说的扣块攻击究竟是什么？](https://www.chainnews.com/articles/806780761278.htm)
+- [淺談礦池挖礦機制 (Pooled Mining)](https://justhodl.blogspot.com/2018/04/pooled-mining.html)
+- [加密貨幣與他們的產地](https://medium.com/taipei-ethereum-meetup/%E5%8A%A0%E5%AF%86%E8%B2%A8%E5%B9%A3%E8%88%87%E4%BB%96%E5%80%91%E7%9A%84%E7%94%A2%E5%9C%B0-21a52c51427f)
+- [POW 矿池挖空块原理和解决方案](https://www.chainnews.com/articles/210557815167.htm)
+- [神鱼发怒，揭露矿圈“扣块攻击”，矿池江湖暗流涌动](https://www.chainnews.com/articles/445562632637.htm)
+- [科普入门 | 空块是什么？为什么矿工要挖空块？](https://m.mifengcha.com/news/5bbd7a3a22285b8f5a903bb5)
