@@ -117,7 +117,7 @@ if __name__ == '__main__':
     block.verify_blockchain()
     
     print("Insert fake transaction.")
-    fake_transaction = Transaction('test123', address, 100, 1, 'Test')    
+    fake_transaction = Transaction('test123', 'address', 100, 1, 'Test')    
     block.chain[1].transactions.append(fake_transaction)
     block.mine_block('lkm543')
 
